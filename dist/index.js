@@ -3,6 +3,7 @@ export * from './modules/users';
 export * from './modules/tasks';
 export * from './modules/projects';
 export * from './modules/time-log';
+export * from './modules/infrastructure';
 export * from './common/';
 export * from './utils/';
 export * from './lib/registry';
