@@ -1,14 +1,6 @@
 import { z, registry } from '../../lib/registry';
-import {
-  ServiceStatus,
-  IncidentStatus,
-  IncidentSeverity,
-  MaintenanceStatus,
-} from './infrastructure.enums';
-
-export const serviceGroupSchema = registry.register(
-  'ServiceGroup',
-  z.object({
+import { ServiceStatus, IncidentStatus, IncidentSeverity, MaintenanceStatus, } from './infrastructure.enums';
+export const serviceGroupSchema = registry.register('ServiceGroup', z.object({
     id: z.string().uuid(),
     name: z.string(),
     description: z.string().nullable().optional(),
@@ -16,12 +8,8 @@ export const serviceGroupSchema = registry.register(
     icon: z.string(),
     order_index: z.number().int(),
     created_at: z.date(),
-  }),
-);
-
-export const serviceSchema = registry.register(
-  'Service',
-  z.object({
+}));
+export const serviceSchema = registry.register('Service', z.object({
     id: z.string().uuid(),
     group_id: z.string().uuid().nullable().optional(),
     name: z.string(),
@@ -34,12 +22,8 @@ export const serviceSchema = registry.register(
     uptime_30d: z.number().min(0).max(100),
     avg_response_ms: z.number().min(0),
     created_at: z.date(),
-  }),
-);
-
-export const dailyMetricSchema = registry.register(
-  'DailyMetric',
-  z.object({
+}));
+export const dailyMetricSchema = registry.register('DailyMetric', z.object({
     id: z.string().uuid(),
     service_id: z.string().uuid(),
     date: z.string(),
@@ -48,23 +32,15 @@ export const dailyMetricSchema = registry.register(
     downtime_minutes: z.number().int().min(0),
     avg_response_ms: z.number().min(0),
     created_at: z.date(),
-  }),
-);
-
-export const incidentUpdateSchema = registry.register(
-  'IncidentUpdate',
-  z.object({
+}));
+export const incidentUpdateSchema = registry.register('IncidentUpdate', z.object({
     id: z.string().uuid(),
     incident_id: z.string().uuid(),
     message: z.string(),
     status: z.nativeEnum(IncidentStatus),
     created_at: z.date(),
-  }),
-);
-
-export const incidentSchema = registry.register(
-  'Incident',
-  z.object({
+}));
+export const incidentSchema = registry.register('Incident', z.object({
     id: z.string().uuid(),
     service_id: z.string().uuid(),
     incident_ref: z.string().nullable().optional(),
@@ -77,12 +53,8 @@ export const incidentSchema = registry.register(
     duration_minutes: z.number().int().min(0).nullable().optional(),
     created_at: z.date(),
     updates: z.array(incidentUpdateSchema).optional(),
-  }),
-);
-
-export const maintenanceSchema = registry.register(
-  'Maintenance',
-  z.object({
+}));
+export const maintenanceSchema = registry.register('Maintenance', z.object({
     id: z.string().uuid(),
     service_id: z.string().uuid(),
     title: z.string(),
@@ -92,12 +64,8 @@ export const maintenanceSchema = registry.register(
     scheduled_end: z.date(),
     actual_end: z.date().nullable().optional(),
     created_at: z.date(),
-  }),
-);
-
-export const adminMachineSchema = registry.register(
-  'AdminMachine',
-  z.object({
+}));
+export const adminMachineSchema = registry.register('AdminMachine', z.object({
     id: z.string().uuid(),
     name: z.string(),
     slug: z.string(),
@@ -109,5 +77,5 @@ export const adminMachineSchema = registry.register(
     description: z.string().nullable().optional(),
     online: z.boolean(),
     created_at: z.date(),
-  }),
-);
+}));
+//# sourceMappingURL=infrastructure.schemas.js.map
