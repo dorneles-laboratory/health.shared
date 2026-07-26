@@ -12,7 +12,7 @@ export const createProjectSchema = registry.register('CreateProjectRequest', z.o
         .trim()
         .openapi({
         description: 'Nome do projeto',
-        example: 'PGI-PROA V2',
+        example: 'Health V2',
     }),
     // description: z
     //   .string()

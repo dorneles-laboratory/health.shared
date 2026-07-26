@@ -16,7 +16,7 @@ export const createProjectSchema = registry.register(
       .trim()
       .openapi({
         description: 'Nome do projeto',
-        example: 'PGI-PROA V2',
+        example: 'Health V2',
       }),
 
     // description: z
