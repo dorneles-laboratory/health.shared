@@ -14,10 +14,10 @@ export const createIncidentSchema = registry.register('CreateIncidentRequest', z
         description: 'Título curto descrevendo o problema',
         example: 'Falha de comunicação com o Gateway de Pagamento',
     }),
-    incident_ref: z.string().trim().nullable().optional().openapi({
+    incidentRef: z.string().trim().nullable().optional().openapi({
         description: 'Código de referência externa (ex: INC-2026-0013)',
     }),
-    service_id: z
+    serviceId: z
         .string()
         .uuid({ message: 'O ID do serviço deve ser um UUID válido.' })
         .nullable()
@@ -27,22 +27,22 @@ export const createIncidentSchema = registry.register('CreateIncidentRequest', z
     }),
     severity: z.nativeEnum(IncidentSeverity).openapi({
         description: 'Nível de impacto do incidente',
-        example: 'PARTIAL_OUTAGE',
+        example: IncidentSeverity.MAJOR_OUTAGE,
     }),
     status: z
         .nativeEnum(IncidentStatus)
         .default(IncidentStatus.INVESTIGATING)
         .openapi({
         description: 'Fase atual de tratamento do incidente',
-        example: 'INVESTIGATING',
+        example: IncidentStatus.INVESTIGATING,
     }),
-    started_at: z.coerce.date().optional().openapi({
+    startedAt: z.coerce.date().optional().openapi({
         description: 'Data e hora exata em que o incidente começou',
     }),
-    resolved_at: z.coerce.date().nullable().optional().openapi({
+    resolvedAt: z.coerce.date().nullable().optional().openapi({
         description: 'Data e hora em que o incidente foi resolvido',
     }),
-    duration_minutes: z.number().int().nullable().optional().openapi({
+    durationMinutes: z.number().int().nullable().optional().openapi({
         description: 'Duração total do incidente em minutos',
     }),
 }));
@@ -54,13 +54,13 @@ export const updateIncidentSchema = registry.register('UpdateIncidentRequest', c
 export const incidentResponseSchema = registry.register('IncidentResponse', z.object({
     id: z.string().uuid(),
     title: z.string(),
-    incident_ref: z.string().nullable(),
-    service_id: z.string().uuid().nullable(),
+    incidentRef: z.string().nullable(),
+    serviceId: z.string().uuid().nullable(),
     severity: z.nativeEnum(IncidentSeverity),
     status: z.nativeEnum(IncidentStatus),
-    started_at: z.date(),
-    resolved_at: z.date().nullable(),
-    duration_minutes: z.number().nullable(),
+    startedAt: z.date(),
+    resolvedAt: z.date().nullable(),
+    durationMinutes: z.number().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
 }));

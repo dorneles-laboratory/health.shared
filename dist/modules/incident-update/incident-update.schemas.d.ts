@@ -1,6 +1,6 @@
 import { z } from '../../lib/registry';
 export declare const createIncidentUpdateSchema: z.ZodObject<{
-    incident_id: z.ZodString;
+    incidentId: z.ZodString;
     message: z.ZodString;
     status: z.ZodEnum<{
         readonly INVESTIGATING: "INVESTIGATING";
@@ -8,10 +8,10 @@ export declare const createIncidentUpdateSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>;
-    created_at: z.ZodOptional<z.ZodCoercedDate<unknown>>;
+    createdAt: z.ZodOptional<z.ZodCoercedDate<unknown>>;
 }, z.core.$strip>;
 export declare const updateIncidentUpdateSchema: z.ZodObject<{
-    incident_id: z.ZodOptional<z.ZodString>;
+    incidentId: z.ZodOptional<z.ZodString>;
     message: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
         readonly INVESTIGATING: "INVESTIGATING";
@@ -19,11 +19,11 @@ export declare const updateIncidentUpdateSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>>;
-    created_at: z.ZodOptional<z.ZodOptional<z.ZodCoercedDate<unknown>>>;
+    createdAt: z.ZodOptional<z.ZodOptional<z.ZodCoercedDate<unknown>>>;
 }, z.core.$strip>;
 export declare const incidentUpdateResponseSchema: z.ZodObject<{
     id: z.ZodString;
-    incident_id: z.ZodString;
+    incidentId: z.ZodString;
     message: z.ZodString;
     status: z.ZodEnum<{
         readonly INVESTIGATING: "INVESTIGATING";
@@ -31,8 +31,8 @@ export declare const incidentUpdateResponseSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>;
-    created_at: z.ZodDate;
-    updated_at: z.ZodDate;
+    createdAt: z.ZodDate;
+    updatedAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const incidentUpdateIdSchema: z.ZodObject<{
     id: z.ZodString;

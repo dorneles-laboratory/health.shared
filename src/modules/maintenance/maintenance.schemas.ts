@@ -29,7 +29,7 @@ export const createMaintenanceSchema = registry.register(
         description: 'Detalhes da janela de manutenção',
       }),
 
-    service_id: z
+    serviceId: z
       .string()
       .uuid({ message: 'O ID do serviço deve ser um UUID válido.' })
       .nullable()
@@ -47,7 +47,7 @@ export const createMaintenanceSchema = registry.register(
         example: 'SCHEDULED',
       }),
 
-    scheduled_start: z.coerce
+    scheduledStart: z.coerce
       .date({
         message: 'A data/hora de início programada é obrigatória.',
       })
@@ -55,7 +55,7 @@ export const createMaintenanceSchema = registry.register(
         description: 'Início programado da manutenção',
       }),
 
-    scheduled_end: z.coerce
+    scheduledEnd: z.coerce
       .date({
         message: 'A data/hora de término programada é obrigatória.',
       })
@@ -63,7 +63,7 @@ export const createMaintenanceSchema = registry.register(
         description: 'Fim programado da manutenção',
       }),
 
-    actual_end: z.coerce.date().nullable().optional().openapi({
+    actualEnd: z.coerce.date().nullable().optional().openapi({
       description: 'Término real da manutenção (preenchido ao concluir)',
     }),
   }),
@@ -85,11 +85,11 @@ export const maintenanceResponseSchema = registry.register(
     id: z.string().uuid(),
     title: z.string(),
     description: z.string().nullable(),
-    service_id: z.string().uuid().nullable(),
+    serviceId: z.string().uuid().nullable(),
     status: z.nativeEnum(MaintenanceStatus),
-    scheduled_start: z.date(),
-    scheduled_end: z.date(),
-    actual_end: z.date().nullable(),
+    scheduledStart: z.date(),
+    scheduledEnd: z.date(),
+    actualEnd: z.date().nullable(),
     createdAt: z.date(),
     updatedAt: z.date(),
   }),
