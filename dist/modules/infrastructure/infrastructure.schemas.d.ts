@@ -5,12 +5,12 @@ export declare const serviceGroupSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     slug: z.ZodString;
     icon: z.ZodString;
-    order_index: z.ZodNumber;
-    created_at: z.ZodDate;
+    orderIndex: z.ZodNumber;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const serviceSchema: z.ZodObject<{
     id: z.ZodString;
-    group_id: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    groupId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     name: z.ZodString;
     slug: z.ZodString;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -22,16 +22,16 @@ export declare const serviceSchema: z.ZodObject<{
         readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
         readonly MAINTENANCE: "MAINTENANCE";
     }>;
-    is_standalone: z.ZodDefault<z.ZodBoolean>;
-    order_index: z.ZodNumber;
-    uptime_30d: z.ZodNumber;
-    avg_response_ms: z.ZodNumber;
-    machine_slug: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    created_at: z.ZodDate;
+    isStandalone: z.ZodDefault<z.ZodBoolean>;
+    orderIndex: z.ZodNumber;
+    uptime30d: z.ZodNumber;
+    avgResponseMs: z.ZodNumber;
+    machineSlug: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const servicePortSchema: z.ZodObject<{
     id: z.ZodString;
-    service_id: z.ZodString;
+    serviceId: z.ZodString;
     port: z.ZodNumber;
     protocol: z.ZodEnum<{
         readonly TCP: "TCP";
@@ -40,21 +40,21 @@ export declare const servicePortSchema: z.ZodObject<{
         readonly HTTPS: "HTTPS";
     }>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    created_at: z.ZodDate;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const dailyMetricSchema: z.ZodObject<{
     id: z.ZodString;
-    service_id: z.ZodString;
+    serviceId: z.ZodString;
     date: z.ZodString;
-    uptime_percent: z.ZodNumber;
-    incident_count: z.ZodNumber;
-    downtime_minutes: z.ZodNumber;
-    avg_response_ms: z.ZodNumber;
-    created_at: z.ZodDate;
+    uptimePercent: z.ZodNumber;
+    incidentCount: z.ZodNumber;
+    downtimeMinutes: z.ZodNumber;
+    avgResponseMs: z.ZodNumber;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const incidentUpdateSchema: z.ZodObject<{
     id: z.ZodString;
-    incident_id: z.ZodString;
+    incidentId: z.ZodString;
     message: z.ZodString;
     status: z.ZodEnum<{
         readonly INVESTIGATING: "INVESTIGATING";
@@ -62,12 +62,12 @@ export declare const incidentUpdateSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>;
-    created_at: z.ZodDate;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const incidentSchema: z.ZodObject<{
     id: z.ZodString;
-    service_id: z.ZodString;
-    incident_ref: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    serviceId: z.ZodString;
+    incidentRef: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     title: z.ZodString;
     description: z.ZodString;
     status: z.ZodEnum<{
@@ -81,13 +81,13 @@ export declare const incidentSchema: z.ZodObject<{
         readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
         readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
     }>;
-    started_at: z.ZodDate;
-    resolved_at: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    duration_minutes: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    created_at: z.ZodDate;
+    startedAt: z.ZodDate;
+    resolvedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    durationMinutes: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    createdAt: z.ZodDate;
     updates: z.ZodOptional<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
-        incident_id: z.ZodString;
+        incidentId: z.ZodString;
         message: z.ZodString;
         status: z.ZodEnum<{
             readonly INVESTIGATING: "INVESTIGATING";
@@ -95,12 +95,12 @@ export declare const incidentSchema: z.ZodObject<{
             readonly MONITORING: "MONITORING";
             readonly RESOLVED: "RESOLVED";
         }>;
-        created_at: z.ZodDate;
+        createdAt: z.ZodDate;
     }, z.core.$strip>>>;
 }, z.core.$strip>;
 export declare const maintenanceSchema: z.ZodObject<{
     id: z.ZodString;
-    service_id: z.ZodString;
+    serviceId: z.ZodString;
     title: z.ZodString;
     description: z.ZodString;
     status: z.ZodEnum<{
@@ -109,10 +109,10 @@ export declare const maintenanceSchema: z.ZodObject<{
         readonly COMPLETED: "COMPLETED";
         readonly CANCELED: "CANCELED";
     }>;
-    scheduled_start: z.ZodDate;
-    scheduled_end: z.ZodDate;
-    actual_end: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    created_at: z.ZodDate;
+    scheduledStart: z.ZodDate;
+    scheduledEnd: z.ZodDate;
+    actualEnd: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 export declare const adminMachineSchema: z.ZodObject<{
     id: z.ZodString;
@@ -120,11 +120,11 @@ export declare const adminMachineSchema: z.ZodObject<{
     slug: z.ZodString;
     os: z.ZodString;
     cpu: z.ZodString;
-    ram_total: z.ZodString;
-    local_ip: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    public_ip: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ramTotal: z.ZodString;
+    localIp: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    publicIp: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     online: z.ZodBoolean;
-    created_at: z.ZodDate;
+    createdAt: z.ZodDate;
 }, z.core.$strip>;
 //# sourceMappingURL=infrastructure.schemas.d.ts.map

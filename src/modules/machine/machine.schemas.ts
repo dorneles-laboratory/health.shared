@@ -45,19 +45,19 @@ export const createMachineSchema = registry.register(
       .nullable()
       .optional()
       .openapi({ example: 'Intel Core i7-12700H' }),
-    ram_total: z
+    ramTotal: z
       .string()
       .trim()
       .nullable()
       .optional()
       .openapi({ example: '32 GB DDR5' }),
-    local_ip: z
+    localIp: z
       .string()
       .trim()
       .nullable()
       .optional()
       .openapi({ example: '192.168.0.10' }),
-    public_ip: z
+    publicIp: z
       .string()
       .trim()
       .nullable()
@@ -97,9 +97,9 @@ export const machineResponseSchema = registry.register(
     slug: z.string(),
     os: z.string().nullable(),
     cpu: z.string().nullable(),
-    ram_total: z.string().nullable(),
-    local_ip: z.string().nullable(),
-    public_ip: z.string().nullable(),
+    ramTotal: z.string().nullable(),
+    localIp: z.string().nullable(),
+    publicIp: z.string().nullable(),
     description: z.string().nullable(),
     online: z.boolean(),
     createdAt: z.date(),

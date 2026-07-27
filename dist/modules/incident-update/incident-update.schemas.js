@@ -1,7 +1,7 @@
 import { z, registry } from '../../lib/registry';
 import { IncidentStatus } from '../incident/incident.enums';
 export const createIncidentUpdateSchema = registry.register('CreateIncidentUpdateRequest', z.object({
-    incident_id: z
+    incidentId: z
         .string({
         error: ({ input }) => input === undefined
             ? 'O ID do incidente é obrigatório.'
@@ -28,7 +28,7 @@ export const createIncidentUpdateSchema = registry.register('CreateIncidentUpdat
         description: 'Status do incidente no momento desta atualização',
         example: 'IDENTIFIED',
     }),
-    created_at: z.coerce.date().optional().openapi({
+    createdAt: z.coerce.date().optional().openapi({
         description: 'Data customizada da atualização (se omitida, usará o default do banco)',
     }),
 }));
@@ -39,11 +39,11 @@ export const updateIncidentUpdateSchema = registry.register('UpdateIncidentUpdat
 }));
 export const incidentUpdateResponseSchema = registry.register('IncidentUpdateResponse', z.object({
     id: z.string().uuid(),
-    incident_id: z.string().uuid(),
+    incidentId: z.string().uuid(),
     message: z.string(),
     status: z.nativeEnum(IncidentStatus),
-    created_at: z.date(),
-    updated_at: z.date(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
 }));
 export const incidentUpdateIdSchema = z.object({
     id: z
