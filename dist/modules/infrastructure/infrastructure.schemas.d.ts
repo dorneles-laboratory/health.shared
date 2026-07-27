@@ -26,6 +26,7 @@ export declare const serviceSchema: z.ZodObject<{
     order_index: z.ZodNumber;
     uptime_30d: z.ZodNumber;
     avg_response_ms: z.ZodNumber;
+    machine_slug: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     created_at: z.ZodDate;
 }, z.core.$strip>;
 export declare const servicePortSchema: z.ZodObject<{

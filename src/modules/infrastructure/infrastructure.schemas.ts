@@ -34,6 +34,7 @@ export const serviceSchema = registry.register(
     order_index: z.number().int(),
     uptime_30d: z.number().min(0).max(100),
     avg_response_ms: z.number().min(0),
+    machine_slug: z.string().nullable().optional(),
     created_at: z.date(),
   }),
 );
