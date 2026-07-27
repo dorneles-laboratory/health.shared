@@ -1,0 +1,41 @@
+import { z } from '../../lib/registry';
+export declare const createMachineSchema: z.ZodObject<{
+    name: z.ZodString;
+    slug: z.ZodString;
+    os: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    cpu: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ram_total: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    local_ip: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    public_ip: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    online: z.ZodDefault<z.ZodBoolean>;
+}, z.core.$strip>;
+export declare const updateMachineSchema: z.ZodObject<{
+    name: z.ZodOptional<z.ZodString>;
+    slug: z.ZodOptional<z.ZodString>;
+    os: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    cpu: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    ram_total: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    local_ip: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    public_ip: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    online: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+}, z.core.$strip>;
+export declare const machineResponseSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    slug: z.ZodString;
+    os: z.ZodNullable<z.ZodString>;
+    cpu: z.ZodNullable<z.ZodString>;
+    ram_total: z.ZodNullable<z.ZodString>;
+    local_ip: z.ZodNullable<z.ZodString>;
+    public_ip: z.ZodNullable<z.ZodString>;
+    description: z.ZodNullable<z.ZodString>;
+    online: z.ZodBoolean;
+    createdAt: z.ZodDate;
+    updatedAt: z.ZodDate;
+}, z.core.$strip>;
+export declare const machineIdSchema: z.ZodObject<{
+    id: z.ZodString;
+}, z.core.$strip>;
+//# sourceMappingURL=machine.schemas.d.ts.map
