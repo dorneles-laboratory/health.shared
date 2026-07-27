@@ -39,6 +39,10 @@ export const createServiceGroupSchema = registry.register('CreateServiceGroupReq
         description: 'Índice usado para ordenação na interface',
         example: 1,
     }),
+    icon: z.string().max(100, { message: 'Ícone muito longo.' }).openapi({
+        description: 'Ícone representativo do grupo de serviços',
+        example: 'globe',
+    }),
 }));
 export const updateServiceGroupSchema = registry.register('UpdateServiceGroupRequest', createServiceGroupSchema
     .partial()
@@ -51,6 +55,7 @@ export const serviceGroupResponseSchema = registry.register('ServiceGroupRespons
     name: z.string(),
     slug: z.string(),
     description: z.string().nullable().optional(),
+    icon: z.string(),
     orderIndex: z.number().int(),
     createdAt: z.date(),
     updatedAt: z.date(),
