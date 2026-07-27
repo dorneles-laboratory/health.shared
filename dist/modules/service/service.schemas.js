@@ -3,9 +3,7 @@ import { ServiceStatus } from './service.enums';
 export const createServiceSchema = registry.register('CreateServiceRequest', z.object({
     name: z
         .string({
-        error: ({ input }) => input === undefined
-            ? 'O nome do serviço é obrigatório.'
-            : 'O nome do serviço deve ser um texto.',
+        message: 'O nome do serviço é obrigatório.',
     })
         .min(2, { message: 'Nome do serviço muito curto.' })
         .max(100, { message: 'Nome do serviço muito longo.' })
@@ -16,9 +14,7 @@ export const createServiceSchema = registry.register('CreateServiceRequest', z.o
     }),
     slug: z
         .string({
-        error: ({ input }) => input === undefined
-            ? 'O slug é obrigatório.'
-            : 'O slug deve ser um texto.',
+        message: 'O slug é obrigatório.',
     })
         .min(2)
         .max(100)
@@ -26,6 +22,32 @@ export const createServiceSchema = registry.register('CreateServiceRequest', z.o
         .openapi({
         description: 'Identificador único amigável (URL-safe)',
         example: 'api-pagamentos',
+    }),
+    machineSlug: z
+        .string({
+        message: 'A máquina (machineSlug) é obrigatória.',
+    })
+        .trim()
+        .openapi({
+        description: 'Slug da máquina onde o serviço está hospedado',
+        example: 'server-prod-01',
+    }),
+    url: z
+        .string({
+        message: 'A URL do serviço é obrigatória.',
+    })
+        .url({ message: 'Deve ser uma URL válida.' })
+        .trim()
+        .openapi({
+        description: 'URL principal do serviço para monitoramento/acesso',
+        example: 'https://api.meusistema.com',
+    }),
+    status: z
+        .nativeEnum(ServiceStatus)
+        .default(ServiceStatus.OPERATIONAL)
+        .openapi({
+        description: 'Status atual de operação do serviço',
+        example: 'OPERATIONAL',
     }),
     description: z
         .string()
@@ -35,13 +57,6 @@ export const createServiceSchema = registry.register('CreateServiceRequest', z.o
         .optional()
         .openapi({
         description: 'Descrição detalhada do serviço',
-    }),
-    status: z
-        .nativeEnum(ServiceStatus)
-        .default(ServiceStatus.OPERATIONAL)
-        .openapi({
-        description: 'Status atual de operação do serviço',
-        example: 'OPERATIONAL',
     }),
     groupId: z
         .string()
@@ -55,14 +70,20 @@ export const createServiceSchema = registry.register('CreateServiceRequest', z.o
 export const updateServiceSchema = registry.register('UpdateServiceRequest', createServiceSchema.partial().refine((data) => Object.keys(data).length > 0, {
     message: 'Pelo menos um campo deve ser fornecido para atualização.',
 }));
-// Schema de Resposta
+// Schema de Resposta (Reflete todos os campos que o banco vai devolver)
 export const serviceResponseSchema = registry.register('ServiceResponse', z.object({
     id: z.string().uuid(),
+    groupId: z.string().uuid().nullable().optional(),
     name: z.string(),
     slug: z.string(),
     description: z.string().nullable().optional(),
+    url: z.string(),
     status: z.nativeEnum(ServiceStatus),
-    groupId: z.string().uuid().nullable().optional(),
+    isStandalone: z.boolean(),
+    orderIndex: z.number().int(),
+    uptime30d: z.number(),
+    avgResponseMs: z.number().int(),
+    machineSlug: z.string(),
     createdAt: z.date(),
     updatedAt: z.date(),
 }));
@@ -70,9 +91,7 @@ export const serviceIdSchema = z.object({
     id: z
         .string()
         .uuid({
-        error: ({ input }) => input === undefined
-            ? 'O ID é obrigatório.'
-            : 'O ID do serviço deve ser um UUID válido.',
+        message: 'O ID do serviço deve ser um UUID válido.',
     })
         .openapi({
         param: {
