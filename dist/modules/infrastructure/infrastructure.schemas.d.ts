@@ -16,16 +16,29 @@ export declare const serviceSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     url: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     status: z.ZodEnum<{
-        readonly OPERATIONAL: "operational";
-        readonly DEGRADED: "degraded";
-        readonly PARTIAL_OUTAGE: "partial_outage";
-        readonly MAJOR_OUTAGE: "major_outage";
-        readonly MAINTENANCE: "maintenance";
+        readonly OPERATIONAL: "OPERATIONAL";
+        readonly DEGRADED: "DEGRADED";
+        readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
+        readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
+        readonly MAINTENANCE: "MAINTENANCE";
     }>;
     is_standalone: z.ZodDefault<z.ZodBoolean>;
     order_index: z.ZodNumber;
     uptime_30d: z.ZodNumber;
     avg_response_ms: z.ZodNumber;
+    created_at: z.ZodDate;
+}, z.core.$strip>;
+export declare const servicePortSchema: z.ZodObject<{
+    id: z.ZodString;
+    service_id: z.ZodString;
+    port: z.ZodNumber;
+    protocol: z.ZodEnum<{
+        readonly TCP: "TCP";
+        readonly UDP: "UDP";
+        readonly HTTP: "HTTP";
+        readonly HTTPS: "HTTPS";
+    }>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     created_at: z.ZodDate;
 }, z.core.$strip>;
 export declare const dailyMetricSchema: z.ZodObject<{
@@ -43,10 +56,10 @@ export declare const incidentUpdateSchema: z.ZodObject<{
     incident_id: z.ZodString;
     message: z.ZodString;
     status: z.ZodEnum<{
-        readonly INVESTIGATING: "investigating";
-        readonly IDENTIFIED: "identified";
-        readonly MONITORING: "monitoring";
-        readonly RESOLVED: "resolved";
+        readonly INVESTIGATING: "INVESTIGATING";
+        readonly IDENTIFIED: "IDENTIFIED";
+        readonly MONITORING: "MONITORING";
+        readonly RESOLVED: "RESOLVED";
     }>;
     created_at: z.ZodDate;
 }, z.core.$strip>;
@@ -57,15 +70,15 @@ export declare const incidentSchema: z.ZodObject<{
     title: z.ZodString;
     description: z.ZodString;
     status: z.ZodEnum<{
-        readonly INVESTIGATING: "investigating";
-        readonly IDENTIFIED: "identified";
-        readonly MONITORING: "monitoring";
-        readonly RESOLVED: "resolved";
+        readonly INVESTIGATING: "INVESTIGATING";
+        readonly IDENTIFIED: "IDENTIFIED";
+        readonly MONITORING: "MONITORING";
+        readonly RESOLVED: "RESOLVED";
     }>;
     severity: z.ZodEnum<{
-        readonly DEGRADED: "degraded";
-        readonly PARTIAL_OUTAGE: "partial_outage";
-        readonly MAJOR_OUTAGE: "major_outage";
+        readonly DEGRADED: "DEGRADED";
+        readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
+        readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
     }>;
     started_at: z.ZodDate;
     resolved_at: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
@@ -76,10 +89,10 @@ export declare const incidentSchema: z.ZodObject<{
         incident_id: z.ZodString;
         message: z.ZodString;
         status: z.ZodEnum<{
-            readonly INVESTIGATING: "investigating";
-            readonly IDENTIFIED: "identified";
-            readonly MONITORING: "monitoring";
-            readonly RESOLVED: "resolved";
+            readonly INVESTIGATING: "INVESTIGATING";
+            readonly IDENTIFIED: "IDENTIFIED";
+            readonly MONITORING: "MONITORING";
+            readonly RESOLVED: "RESOLVED";
         }>;
         created_at: z.ZodDate;
     }, z.core.$strip>>>;
@@ -90,10 +103,10 @@ export declare const maintenanceSchema: z.ZodObject<{
     title: z.ZodString;
     description: z.ZodString;
     status: z.ZodEnum<{
-        readonly SCHEDULED: "scheduled";
-        readonly IN_PROGRESS: "in_progress";
-        readonly COMPLETED: "completed";
-        readonly CANCELED: "canceled";
+        readonly SCHEDULED: "SCHEDULED";
+        readonly IN_PROGRESS: "IN_PROGRESS";
+        readonly COMPLETED: "COMPLETED";
+        readonly CANCELED: "CANCELED";
     }>;
     scheduled_start: z.ZodDate;
     scheduled_end: z.ZodDate;
