@@ -1,39 +1,49 @@
 export const ServiceStatus = {
-  OPERATIONAL: 'operational',
-  DEGRADED: 'degraded',
-  PARTIAL_OUTAGE: 'partial_outage',
-  MAJOR_OUTAGE: 'major_outage',
-  MAINTENANCE: 'maintenance',
+  OPERATIONAL: 'OPERATIONAL',
+  DEGRADED: 'DEGRADED',
+  PARTIAL_OUTAGE: 'PARTIAL_OUTAGE',
+  MAJOR_OUTAGE: 'MAJOR_OUTAGE',
+  MAINTENANCE: 'MAINTENANCE',
 } as const;
 
 export type EnumServiceStatus =
   (typeof ServiceStatus)[keyof typeof ServiceStatus];
 
 export const IncidentStatus = {
-  INVESTIGATING: 'investigating',
-  IDENTIFIED: 'identified',
-  MONITORING: 'monitoring',
-  RESOLVED: 'resolved',
+  INVESTIGATING: 'INVESTIGATING',
+  IDENTIFIED: 'IDENTIFIED',
+  MONITORING: 'MONITORING',
+  RESOLVED: 'RESOLVED',
 } as const;
 
 export type EnumIncidentStatus =
   (typeof IncidentStatus)[keyof typeof IncidentStatus];
 
 export const IncidentSeverity = {
-  DEGRADED: 'degraded',
-  PARTIAL_OUTAGE: 'partial_outage',
-  MAJOR_OUTAGE: 'major_outage',
+  DEGRADED: 'DEGRADED',
+  PARTIAL_OUTAGE: 'PARTIAL_OUTAGE',
+  MAJOR_OUTAGE: 'MAJOR_OUTAGE',
 } as const;
 
 export type EnumIncidentSeverity =
   (typeof IncidentSeverity)[keyof typeof IncidentSeverity];
 
 export const MaintenanceStatus = {
-  SCHEDULED: 'scheduled',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed',
-  CANCELED: 'canceled',
+  SCHEDULED: 'SCHEDULED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELED: 'CANCELED',
 } as const;
 
 export type EnumMaintenanceStatus =
   (typeof MaintenanceStatus)[keyof typeof MaintenanceStatus];
+
+export const ServicePortProtocol = {
+  TCP: 'TCP',
+  UDP: 'UDP',
+  HTTP: 'HTTP',
+  HTTPS: 'HTTPS',
+} as const;
+
+export type EnumServicePortProtocol =
+  (typeof ServicePortProtocol)[keyof typeof ServicePortProtocol];

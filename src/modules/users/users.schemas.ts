@@ -53,7 +53,7 @@ export const createUserSchema = registry.register(
     //   example: '(55) 99999-9999',
     // }),
 
-    // birth_date: z.coerce
+    // birthDate: z.coerce
     //   .date({
     //     message: 'A data de nascimento deve ser válida.',
     //   })
@@ -68,7 +68,7 @@ export const createUserSchema = registry.register(
     //   example: 'Rua Exemplo, 123 - Cidade/UF',
     // }),
 
-    is_active: z.boolean().default(true).optional(),
+    isActive: z.boolean().default(true).optional(),
   }),
 );
 
@@ -90,7 +90,7 @@ export const updateUserSchema = createUserSchema
         example: 'NovaSenha@123',
       }),
 
-    is_active: z.boolean().optional(),
+    isActive: z.boolean().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'Pelo menos um campo deve ser fornecido para atualização.',
@@ -104,11 +104,11 @@ export const userResponseSchema = registry.register(
     name: z.string(),
     email: z.string().email(),
     // cellphone: z.string().nullable(),
-    // birth_date: z.coerce.date().nullable(),
+    // birthDate: z.coerce.date().nullable(),
     // address: z.string().nullable(),
-    is_active: z.boolean(),
-    created_at: z.coerce.date(),
-    updated_at: z.coerce.date(),
+    isActive: z.boolean(),
+    createdAt: z.coerce.date(),
+    updatedAt: z.coerce.date(),
     // deletedAt: z.coerce.date().nullable(),
   }),
 );

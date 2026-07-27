@@ -4,6 +4,7 @@ import {
   IncidentStatus,
   IncidentSeverity,
   MaintenanceStatus,
+  ServicePortProtocol,
 } from './infrastructure.enums';
 
 export const serviceGroupSchema = registry.register(
@@ -33,6 +34,18 @@ export const serviceSchema = registry.register(
     order_index: z.number().int(),
     uptime_30d: z.number().min(0).max(100),
     avg_response_ms: z.number().min(0),
+    created_at: z.date(),
+  }),
+);
+
+export const servicePortSchema = registry.register(
+  'ServicePort',
+  z.object({
+    id: z.string().uuid(),
+    service_id: z.string().uuid(),
+    port: z.number().int().positive(),
+    protocol: z.nativeEnum(ServicePortProtocol),
+    description: z.string().nullable().optional(),
     created_at: z.date(),
   }),
 );
