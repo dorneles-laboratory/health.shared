@@ -1,11 +1,8 @@
 import { z, registry } from '../../lib/registry';
-import {
-  ServiceStatus,
-  IncidentStatus,
-  IncidentSeverity,
-  MaintenanceStatus,
-  ServicePortProtocol,
-} from './infrastructure.enums';
+import { IncidentStatus, IncidentSeverity } from '../incident/incident.enums';
+import { MaintenanceStatus } from '../maintenance/maintenance.enums';
+import { ServicePortProtocol } from '../infrastructure/infrastructure.enums';
+import { ServiceStatus } from '../service/service.enums';
 
 export const serviceGroupSchema = registry.register(
   'ServiceGroup',
