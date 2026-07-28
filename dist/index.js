@@ -10,6 +10,7 @@ export * from './modules/machine';
 export * from './modules/maintenance';
 export * from './modules/incident';
 export * from './modules/incident-update';
+export * from './modules/daily-metric';
 export * from './common/';
 export * from './utils/';
 export * from './lib/registry';
