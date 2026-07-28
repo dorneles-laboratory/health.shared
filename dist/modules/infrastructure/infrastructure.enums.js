@@ -1,7 +1,2 @@
-export const ServicePortProtocol = {
-    TCP: 'TCP',
-    UDP: 'UDP',
-    HTTP: 'HTTP',
-    HTTPS: 'HTTPS',
-};
+"use strict";
 //# sourceMappingURL=infrastructure.enums.js.map
