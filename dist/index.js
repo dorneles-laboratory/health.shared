@@ -5,6 +5,7 @@ export * from './modules/projects';
 export * from './modules/time-log';
 export * from './modules/service';
 export * from './modules/service-group';
+export * from './modules/service-port';
 export * from './modules/machine';
 export * from './modules/maintenance';
 export * from './modules/incident';
