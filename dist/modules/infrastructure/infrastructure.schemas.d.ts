@@ -33,12 +33,7 @@ export declare const servicePortSchema: z.ZodObject<{
     id: z.ZodString;
     serviceId: z.ZodString;
     port: z.ZodNumber;
-    protocol: z.ZodEnum<{
-        readonly TCP: "TCP";
-        readonly UDP: "UDP";
-        readonly HTTP: "HTTP";
-        readonly HTTPS: "HTTPS";
-    }>;
+    protocol: z.ZodEnum<any>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     createdAt: z.ZodDate;
 }, z.core.$strip>;
