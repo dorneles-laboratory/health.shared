@@ -1,3 +1,3 @@
 import { z } from '@lib/shared';
-import { servicePortSchema } from './service-port.schemas';
+import { createServicePortSchema, updateServicePortSchema, servicePortResponseSchema, servicePortIdSchema, } from './service-port.schemas';
 //# sourceMappingURL=service-port.types.js.map
