@@ -2,10 +2,11 @@ import { z } from '../../lib/registry';
 export declare const monitorResultSchema: z.ZodObject<{
     serviceId: z.ZodString;
     status: z.ZodEnum<{
-        readonly INVESTIGATING: "INVESTIGATING";
-        readonly IDENTIFIED: "IDENTIFIED";
-        readonly MONITORING: "MONITORING";
-        readonly RESOLVED: "RESOLVED";
+        readonly OPERATIONAL: "OPERATIONAL";
+        readonly DEGRADED: "DEGRADED";
+        readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
+        readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
+        readonly MAINTENANCE: "MAINTENANCE";
     }>;
     latency: z.ZodNumber;
 }, z.core.$strip>;
@@ -13,10 +14,11 @@ export declare const processResultsSchema: z.ZodObject<{
     results: z.ZodArray<z.ZodObject<{
         serviceId: z.ZodString;
         status: z.ZodEnum<{
-            readonly INVESTIGATING: "INVESTIGATING";
-            readonly IDENTIFIED: "IDENTIFIED";
-            readonly MONITORING: "MONITORING";
-            readonly RESOLVED: "RESOLVED";
+            readonly OPERATIONAL: "OPERATIONAL";
+            readonly DEGRADED: "DEGRADED";
+            readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
+            readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
+            readonly MAINTENANCE: "MAINTENANCE";
         }>;
         latency: z.ZodNumber;
     }, z.core.$strip>>;
