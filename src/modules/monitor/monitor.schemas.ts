@@ -1,5 +1,5 @@
+import { ServiceStatus } from '../service/service.enums';
 import { z, registry } from '../../lib/registry';
-import { IncidentStatus } from '../incident/incident.enums';
 
 export const monitorResultSchema = registry.register(
   'MonitorResult',
@@ -9,7 +9,7 @@ export const monitorResultSchema = registry.register(
       .uuid({ message: 'O ID do serviço deve ser um UUID válido.' })
       .openapi({ description: 'ID do serviço testado' }),
     status: z
-      .enum(IncidentStatus)
+      .enum(ServiceStatus)
       .openapi({ description: 'Status retornado pelo ping' }),
     latency: z
       .number()
