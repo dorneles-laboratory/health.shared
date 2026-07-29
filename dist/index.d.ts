@@ -11,6 +11,7 @@ export * from './modules/maintenance';
 export * from './modules/incident';
 export * from './modules/incident-update';
 export * from './modules/daily-metric';
+export * from './modules/monitor';
 export * from './common/';
 export * from './utils/';
 export * from './lib/registry';

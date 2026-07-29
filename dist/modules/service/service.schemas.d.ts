@@ -13,6 +13,8 @@ export declare const createServiceSchema: z.ZodObject<{
     }>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     groupId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    isMonitored: z.ZodDefault<z.ZodBoolean>;
+    isStandalone: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
 export declare const updateServiceSchema: z.ZodObject<{
     name: z.ZodOptional<z.ZodString>;
@@ -28,6 +30,8 @@ export declare const updateServiceSchema: z.ZodObject<{
     }>>>;
     description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     groupId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    isMonitored: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    isStandalone: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
 }, z.core.$strip>;
 export declare const serviceResponseSchema: z.ZodObject<{
     id: z.ZodString;
@@ -48,6 +52,7 @@ export declare const serviceResponseSchema: z.ZodObject<{
     uptime30d: z.ZodNumber;
     avgResponseMs: z.ZodNumber;
     machineSlug: z.ZodString;
+    isMonitored: z.ZodBoolean;
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, z.core.$strip>;

@@ -75,6 +75,14 @@ export const createServiceSchema = registry.register(
       .openapi({
         description: 'UUID do grupo de serviços ao qual este serviço pertence',
       }),
+    isMonitored: z.boolean().default(false).openapi({
+      description: 'Indica se o serviço está sendo monitorado',
+      example: false,
+    }),
+    isStandalone: z.boolean().default(false).openapi({
+      description: 'Indica se o serviço é independente (standalone)',
+      example: false,
+    }),
   }),
 );
 
@@ -101,6 +109,7 @@ export const serviceResponseSchema = registry.register(
     uptime30d: z.number(),
     avgResponseMs: z.number().int(),
     machineSlug: z.string(),
+    isMonitored: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date(),
   }),
