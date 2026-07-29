@@ -66,6 +66,14 @@ export const createServiceSchema = registry.register('CreateServiceRequest', z.o
         .openapi({
         description: 'UUID do grupo de serviços ao qual este serviço pertence',
     }),
+    isMonitored: z.boolean().default(false).openapi({
+        description: 'Indica se o serviço está sendo monitorado',
+        example: false,
+    }),
+    isStandalone: z.boolean().default(false).openapi({
+        description: 'Indica se o serviço é independente (standalone)',
+        example: false,
+    }),
 }));
 export const updateServiceSchema = registry.register('UpdateServiceRequest', createServiceSchema.partial().refine((data) => Object.keys(data).length > 0, {
     message: 'Pelo menos um campo deve ser fornecido para atualização.',
@@ -84,6 +92,7 @@ export const serviceResponseSchema = registry.register('ServiceResponse', z.obje
     uptime30d: z.number(),
     avgResponseMs: z.number().int(),
     machineSlug: z.string(),
+    isMonitored: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date(),
 }));
