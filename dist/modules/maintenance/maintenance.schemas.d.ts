@@ -44,6 +44,24 @@ export declare const maintenanceResponseSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, z.core.$strip>;
+export declare const maintenancePublicResponseSchema: z.ZodObject<{
+    id: z.ZodString;
+    serviceId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    status: z.ZodEnum<{
+        readonly SCHEDULED: "SCHEDULED";
+        readonly IN_PROGRESS: "IN_PROGRESS";
+        readonly COMPLETED: "COMPLETED";
+        readonly CANCELED: "CANCELED";
+    }>;
+    scheduledStart: z.ZodDate;
+    scheduledEnd: z.ZodDate;
+    service: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        name: z.ZodString;
+        slug: z.ZodString;
+    }, z.core.$strip>>>;
+}, z.core.$strip>;
 export declare const maintenanceIdSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;

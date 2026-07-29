@@ -115,6 +115,23 @@ export const serviceResponseSchema = registry.register(
   }),
 );
 
+// Schema de Resposta Pública (Exclui campos sensíveis ou internos)
+export const servicePublicResponseSchema = registry.register(
+  'ServicePublicResponse',
+  z.object({
+    id: z.string().uuid(),
+    groupId: z.string().uuid().nullable().optional(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.string().nullable().optional(),
+    status: z.nativeEnum(ServiceStatus),
+    isStandalone: z.boolean(),
+    orderIndex: z.number().int(),
+    uptime30d: z.number(),
+    avgResponseMs: z.number().int(),
+  }),
+);
+
 export const serviceIdSchema = z.object({
   id: z
     .string()
