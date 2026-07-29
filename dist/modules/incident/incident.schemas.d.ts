@@ -77,6 +77,7 @@ export declare const incidentPublicResponseSchema: z.ZodObject<{
     startedAt: z.ZodDate;
     resolvedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     durationMinutes: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    incidentRef: z.ZodNullable<z.ZodString>;
     service: z.ZodOptional<z.ZodNullable<z.ZodObject<{
         name: z.ZodString;
         slug: z.ZodString;
