@@ -106,6 +106,9 @@ export const maintenancePublicResponseSchema = registry.register(
     status: z.nativeEnum(MaintenanceStatus),
     scheduledStart: z.date(),
     scheduledEnd: z.date(),
+    // actualEnd: z.date().nullable().optional(),
+    // createdAt: z.date(),
+    // updatedAt: z.date(),
     service: z
       .object({
         name: z.string(),

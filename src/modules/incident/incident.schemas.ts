@@ -97,6 +97,7 @@ export const incidentPublicResponseSchema = registry.register(
     startedAt: z.date(),
     resolvedAt: z.date().nullable().optional(),
     durationMinutes: z.number().int().nullable().optional(),
+    incidentRef: z.string().nullable(),
     service: z
       .object({
         name: z.string(),
