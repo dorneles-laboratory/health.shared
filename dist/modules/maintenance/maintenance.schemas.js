@@ -74,6 +74,23 @@ export const maintenanceResponseSchema = registry.register('MaintenanceResponse'
     createdAt: z.date(),
     updatedAt: z.date(),
 }));
+// Schema de Resposta Pública
+export const maintenancePublicResponseSchema = registry.register('MaintenancePublicResponse', z.object({
+    id: z.string().uuid(),
+    serviceId: z.string().uuid().nullable().optional(),
+    title: z.string(),
+    description: z.string().nullable().optional(),
+    status: z.nativeEnum(MaintenanceStatus),
+    scheduledStart: z.date(),
+    scheduledEnd: z.date(),
+    service: z
+        .object({
+        name: z.string(),
+        slug: z.string(),
+    })
+        .nullable()
+        .optional(),
+}));
 export const maintenanceIdSchema = z.object({
     id: z
         .string()

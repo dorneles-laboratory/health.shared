@@ -64,6 +64,23 @@ export const incidentResponseSchema = registry.register('IncidentResponse', z.ob
     createdAt: z.date(),
     updatedAt: z.date(),
 }));
+export const incidentPublicResponseSchema = registry.register('IncidentPublicResponse', z.object({
+    id: z.string().uuid(),
+    serviceId: z.string().uuid().nullable().optional(),
+    title: z.string(),
+    status: z.nativeEnum(IncidentStatus),
+    severity: z.nativeEnum(IncidentSeverity),
+    startedAt: z.date(),
+    resolvedAt: z.date().nullable().optional(),
+    durationMinutes: z.number().int().nullable().optional(),
+    service: z
+        .object({
+        name: z.string(),
+        slug: z.string(),
+    })
+        .nullable()
+        .optional(),
+}));
 export const incidentIdSchema = z.object({
     id: z
         .string()

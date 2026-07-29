@@ -56,6 +56,24 @@ export declare const serviceResponseSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, z.core.$strip>;
+export declare const servicePublicResponseSchema: z.ZodObject<{
+    id: z.ZodString;
+    groupId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    name: z.ZodString;
+    slug: z.ZodString;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    status: z.ZodEnum<{
+        readonly OPERATIONAL: "OPERATIONAL";
+        readonly DEGRADED: "DEGRADED";
+        readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
+        readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
+        readonly MAINTENANCE: "MAINTENANCE";
+    }>;
+    isStandalone: z.ZodBoolean;
+    orderIndex: z.ZodNumber;
+    uptime30d: z.ZodNumber;
+    avgResponseMs: z.ZodNumber;
+}, z.core.$strip>;
 export declare const serviceIdSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
