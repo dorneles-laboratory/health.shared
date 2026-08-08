@@ -1,1 +1,0 @@
-{"version":3,"file":"incident.enums.js","sourceRoot":"","sources":["../../../src/modules/incident/incident.enums.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,MAAM,cAAc,GAAG;IAC5B,aAAa,EAAE,eAAe;IAC9B,UAAU,EAAE,YAAY;IACxB,UAAU,EAAE,YAAY;IACxB,QAAQ,EAAE,UAAU;CACZ,CAAC;AAKX,MAAM,CAAC,MAAM,gBAAgB,GAAG;IAC9B,QAAQ,EAAE,UAAU;IACpB,cAAc,EAAE,gBAAgB;IAChC,YAAY,EAAE,cAAc;CACpB,CAAC"}
