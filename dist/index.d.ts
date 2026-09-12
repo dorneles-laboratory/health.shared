@@ -339,7 +339,8 @@ type PaginatedTimeLogsDTO = z.infer<typeof paginatedTimeLogsResponseSchema>;
 declare const createServiceSchema: z.ZodObject<{
     name: z.ZodString;
     slug: z.ZodString;
-    machineSlug: z.ZodString;
+    machineSlug: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    machineId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     url: z.ZodString;
     status: z.ZodDefault<z.ZodEnum<{
         readonly OPERATIONAL: "OPERATIONAL";
@@ -352,11 +353,15 @@ declare const createServiceSchema: z.ZodObject<{
     groupId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     isMonitored: z.ZodDefault<z.ZodBoolean>;
     isStandalone: z.ZodDefault<z.ZodBoolean>;
+    isPrivate: z.ZodDefault<z.ZodBoolean>;
+    showExternalLink: z.ZodDefault<z.ZodBoolean>;
+    externalUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, z.core.$strip>;
 declare const updateServiceSchema: z.ZodObject<{
     name: z.ZodOptional<z.ZodString>;
     slug: z.ZodOptional<z.ZodString>;
-    machineSlug: z.ZodOptional<z.ZodString>;
+    machineSlug: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    machineId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     url: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodDefault<z.ZodEnum<{
         readonly OPERATIONAL: "OPERATIONAL";
@@ -369,6 +374,9 @@ declare const updateServiceSchema: z.ZodObject<{
     groupId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     isMonitored: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
     isStandalone: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    isPrivate: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    showExternalLink: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    externalUrl: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
 }, z.core.$strip>;
 declare const serviceResponseSchema: z.ZodObject<{
     id: z.ZodString;
@@ -388,8 +396,12 @@ declare const serviceResponseSchema: z.ZodObject<{
     orderIndex: z.ZodNumber;
     uptime30d: z.ZodNumber;
     avgResponseMs: z.ZodNumber;
-    machineSlug: z.ZodString;
+    machineId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    machineSlug: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     isMonitored: z.ZodBoolean;
+    isPrivate: z.ZodDefault<z.ZodBoolean>;
+    showExternalLink: z.ZodDefault<z.ZodBoolean>;
+    externalUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, z.core.$strip>;
@@ -399,6 +411,7 @@ declare const servicePublicResponseSchema: z.ZodObject<{
     name: z.ZodString;
     slug: z.ZodString;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    url: z.ZodOptional<z.ZodString>;
     status: z.ZodEnum<{
         readonly OPERATIONAL: "OPERATIONAL";
         readonly DEGRADED: "DEGRADED";
@@ -410,6 +423,8 @@ declare const servicePublicResponseSchema: z.ZodObject<{
     orderIndex: z.ZodNumber;
     uptime30d: z.ZodNumber;
     avgResponseMs: z.ZodNumber;
+    showExternalLink: z.ZodDefault<z.ZodBoolean>;
+    externalUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, z.core.$strip>;
 declare const serviceIdSchema: z.ZodObject<{
     id: z.ZodString;
@@ -465,7 +480,6 @@ type ServiceGroupIdDTO = z.infer<typeof serviceGroupIdSchema>;
 type PaginatedServiceGroupsDTO = PaginatedResultDTO<ServiceGroupResponseDTO>;
 
 declare const createServicePortSchema: z.ZodObject<{
-    serviceId: z.ZodString;
     port: z.ZodNumber;
     protocol: z.ZodEnum<{
         readonly TCP: "TCP";
@@ -473,10 +487,19 @@ declare const createServicePortSchema: z.ZodObject<{
         readonly HTTP: "HTTP";
         readonly HTTPS: "HTTPS";
     }>;
+    machineId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    serviceId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    projectId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    label: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    status: z.ZodDefault<z.ZodEnum<{
+        readonly ACTIVE: "ACTIVE";
+        readonly RESERVED: "RESERVED";
+        readonly INACTIVE: "INACTIVE";
+    }>>;
+    isPublic: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
 declare const updateServicePortSchema: z.ZodObject<{
-    serviceId: z.ZodOptional<z.ZodString>;
     port: z.ZodOptional<z.ZodNumber>;
     protocol: z.ZodOptional<z.ZodEnum<{
         readonly TCP: "TCP";
@@ -484,11 +507,20 @@ declare const updateServicePortSchema: z.ZodObject<{
         readonly HTTP: "HTTP";
         readonly HTTPS: "HTTPS";
     }>>;
+    machineId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    serviceId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    projectId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    label: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    status: z.ZodOptional<z.ZodDefault<z.ZodEnum<{
+        readonly ACTIVE: "ACTIVE";
+        readonly RESERVED: "RESERVED";
+        readonly INACTIVE: "INACTIVE";
+    }>>>;
+    isPublic: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
 }, z.core.$strip>;
 declare const servicePortResponseSchema: z.ZodObject<{
     id: z.ZodString;
-    serviceId: z.ZodString;
     port: z.ZodNumber;
     protocol: z.ZodEnum<{
         readonly TCP: "TCP";
@@ -496,9 +528,48 @@ declare const servicePortResponseSchema: z.ZodObject<{
         readonly HTTP: "HTTP";
         readonly HTTPS: "HTTPS";
     }>;
+    machineId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    serviceId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    projectId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    label: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    status: z.ZodEnum<{
+        readonly ACTIVE: "ACTIVE";
+        readonly RESERVED: "RESERVED";
+        readonly INACTIVE: "INACTIVE";
+    }>;
+    isPublic: z.ZodBoolean;
+    machine: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        slug: z.ZodString;
+    }, z.core.$strip>>>;
+    service: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        slug: z.ZodString;
+    }, z.core.$strip>>>;
+    project: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+    }, z.core.$strip>>>;
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
+}, z.core.$strip>;
+declare const checkPortAvailabilitySchema: z.ZodObject<{
+    machineId: z.ZodString;
+    port: z.ZodCoercedNumber<unknown>;
+    protocol: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        readonly TCP: "TCP";
+        readonly UDP: "UDP";
+        readonly HTTP: "HTTP";
+        readonly HTTPS: "HTTPS";
+    }>>>;
+}, z.core.$strip>;
+declare const suggestFreePortsQuerySchema: z.ZodObject<{
+    machineId: z.ZodOptional<z.ZodString>;
+    startPort: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+    count: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
 }, z.core.$strip>;
 declare const servicePortIdSchema: z.ZodObject<{
     id: z.ZodString;
@@ -508,6 +579,8 @@ type CreateServicePortDTO = z.infer<typeof createServicePortSchema>;
 type UpdateServicePortDTO = z.infer<typeof updateServicePortSchema>;
 type ServicePortResponseDTO = z.infer<typeof servicePortResponseSchema>;
 type ServicePortIdDTO = z.infer<typeof servicePortIdSchema>;
+type CheckPortAvailabilityDTO = z.infer<typeof checkPortAvailabilitySchema>;
+type SuggestFreePortsDTO = z.infer<typeof suggestFreePortsQuerySchema>;
 type PaginatedServicePortsDTO = PaginatedResultDTO<ServicePortResponseDTO>;
 
 declare const ServicePortProtocol: {
@@ -517,6 +590,12 @@ declare const ServicePortProtocol: {
     readonly HTTPS: "HTTPS";
 };
 type EnumServicePortProtocol = (typeof ServicePortProtocol)[keyof typeof ServicePortProtocol];
+declare const PortStatus: {
+    readonly ACTIVE: "ACTIVE";
+    readonly RESERVED: "RESERVED";
+    readonly INACTIVE: "INACTIVE";
+};
+type EnumPortStatus = (typeof PortStatus)[keyof typeof PortStatus];
 
 declare const createMachineSchema: z.ZodObject<{
     name: z.ZodString;
@@ -526,6 +605,13 @@ declare const createMachineSchema: z.ZodObject<{
     ramTotal: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     localIp: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     publicIp: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    agentToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    diskTotal: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ramUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    cpuUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     online: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
@@ -537,16 +623,42 @@ declare const updateMachineSchema: z.ZodObject<{
     ramTotal: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     localIp: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     publicIp: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    agentToken: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    diskTotal: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    ramUsagePercent: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
+    cpuUsagePercent: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
+    diskUsagePercent: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
+    uptimeSeconds: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
+    lastHeartbeat: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>>;
     description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     online: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+}, z.core.$strip>;
+declare const machineHeartbeatSchema: z.ZodObject<{
+    os: z.ZodOptional<z.ZodString>;
+    cpu: z.ZodOptional<z.ZodString>;
+    ramTotal: z.ZodOptional<z.ZodString>;
+    diskTotal: z.ZodOptional<z.ZodString>;
+    ramUsagePercent: z.ZodOptional<z.ZodNumber>;
+    cpuUsagePercent: z.ZodOptional<z.ZodNumber>;
+    diskUsagePercent: z.ZodOptional<z.ZodNumber>;
+    uptimeSeconds: z.ZodOptional<z.ZodNumber>;
+    localIp: z.ZodOptional<z.ZodString>;
+    publicIp: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 declare const machineResponseSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
     slug: z.ZodString;
+    agentToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     os: z.ZodNullable<z.ZodString>;
     cpu: z.ZodNullable<z.ZodString>;
     ramTotal: z.ZodNullable<z.ZodString>;
+    diskTotal: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ramUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    cpuUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     localIp: z.ZodNullable<z.ZodString>;
     publicIp: z.ZodNullable<z.ZodString>;
     description: z.ZodNullable<z.ZodString>;
@@ -554,13 +666,70 @@ declare const machineResponseSchema: z.ZodObject<{
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, z.core.$strip>;
+declare const machineDetailResponseSchema: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    slug: z.ZodString;
+    agentToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    os: z.ZodNullable<z.ZodString>;
+    cpu: z.ZodNullable<z.ZodString>;
+    ramTotal: z.ZodNullable<z.ZodString>;
+    diskTotal: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ramUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    cpuUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    localIp: z.ZodNullable<z.ZodString>;
+    publicIp: z.ZodNullable<z.ZodString>;
+    description: z.ZodNullable<z.ZodString>;
+    online: z.ZodBoolean;
+    createdAt: z.ZodDate;
+    updatedAt: z.ZodDate;
+    services: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        slug: z.ZodString;
+        url: z.ZodString;
+        status: z.ZodString;
+        uptime30d: z.ZodNumber;
+        avgResponseMs: z.ZodNumber;
+        ports: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            port: z.ZodNumber;
+            protocol: z.ZodString;
+            description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+            status: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>>;
+    }, z.core.$strip>>>;
+    ports: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        port: z.ZodNumber;
+        protocol: z.ZodString;
+        label: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        status: z.ZodString;
+        isPublic: z.ZodBoolean;
+        service: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+            slug: z.ZodString;
+        }, z.core.$strip>>>;
+        project: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+        }, z.core.$strip>>>;
+    }, z.core.$strip>>>;
+}, z.core.$strip>;
 declare const machineIdSchema: z.ZodObject<{
     id: z.ZodString;
 }, z.core.$strip>;
 
 type CreateMachineDTO = z.infer<typeof createMachineSchema>;
 type UpdateMachineDTO = z.infer<typeof updateMachineSchema>;
+type MachineHeartbeatDTO = z.infer<typeof machineHeartbeatSchema>;
 type MachineResponseDTO = z.infer<typeof machineResponseSchema>;
+type MachineDetailResponseDTO = z.infer<typeof machineDetailResponseSchema>;
 type MachineIdDTO = z.infer<typeof machineIdSchema>;
 type PaginatedMachinesDTO = PaginatedResultDTO<MachineResponseDTO>;
 
@@ -650,6 +819,14 @@ declare const createIncidentSchema: z.ZodObject<{
     title: z.ZodString;
     incidentRef: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     serviceId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    type: z.ZodDefault<z.ZodEnum<{
+        readonly OUTAGE: "OUTAGE";
+        readonly HTTP_ERROR: "HTTP_ERROR";
+        readonly PERFORMANCE: "PERFORMANCE";
+        readonly SSL_CERTIFICATE: "SSL_CERTIFICATE";
+        readonly MAINTENANCE: "MAINTENANCE";
+        readonly OTHER: "OTHER";
+    }>>;
     severity: z.ZodEnum<{
         readonly DEGRADED: "DEGRADED";
         readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
@@ -661,6 +838,9 @@ declare const createIncidentSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>>;
+    isAutoGenerated: z.ZodDefault<z.ZodBoolean>;
+    httpStatus: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    errorDetails: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     startedAt: z.ZodOptional<z.ZodCoercedDate<unknown>>;
     resolvedAt: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
     durationMinutes: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
@@ -669,6 +849,14 @@ declare const updateIncidentSchema: z.ZodObject<{
     title: z.ZodOptional<z.ZodString>;
     incidentRef: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     serviceId: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    type: z.ZodOptional<z.ZodDefault<z.ZodEnum<{
+        readonly OUTAGE: "OUTAGE";
+        readonly HTTP_ERROR: "HTTP_ERROR";
+        readonly PERFORMANCE: "PERFORMANCE";
+        readonly SSL_CERTIFICATE: "SSL_CERTIFICATE";
+        readonly MAINTENANCE: "MAINTENANCE";
+        readonly OTHER: "OTHER";
+    }>>>;
     severity: z.ZodOptional<z.ZodEnum<{
         readonly DEGRADED: "DEGRADED";
         readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
@@ -680,6 +868,9 @@ declare const updateIncidentSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>>>;
+    isAutoGenerated: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    httpStatus: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
+    errorDetails: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
     startedAt: z.ZodOptional<z.ZodOptional<z.ZodCoercedDate<unknown>>>;
     resolvedAt: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>>;
     durationMinutes: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
@@ -689,6 +880,14 @@ declare const incidentResponseSchema: z.ZodObject<{
     title: z.ZodString;
     incidentRef: z.ZodNullable<z.ZodString>;
     serviceId: z.ZodNullable<z.ZodString>;
+    type: z.ZodEnum<{
+        readonly OUTAGE: "OUTAGE";
+        readonly HTTP_ERROR: "HTTP_ERROR";
+        readonly PERFORMANCE: "PERFORMANCE";
+        readonly SSL_CERTIFICATE: "SSL_CERTIFICATE";
+        readonly MAINTENANCE: "MAINTENANCE";
+        readonly OTHER: "OTHER";
+    }>;
     severity: z.ZodEnum<{
         readonly DEGRADED: "DEGRADED";
         readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
@@ -700,6 +899,9 @@ declare const incidentResponseSchema: z.ZodObject<{
         readonly MONITORING: "MONITORING";
         readonly RESOLVED: "RESOLVED";
     }>;
+    isAutoGenerated: z.ZodBoolean;
+    httpStatus: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    errorDetails: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     startedAt: z.ZodDate;
     resolvedAt: z.ZodNullable<z.ZodDate>;
     durationMinutes: z.ZodNullable<z.ZodNumber>;
@@ -710,6 +912,14 @@ declare const incidentPublicResponseSchema: z.ZodObject<{
     id: z.ZodString;
     serviceId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     title: z.ZodString;
+    type: z.ZodEnum<{
+        readonly OUTAGE: "OUTAGE";
+        readonly HTTP_ERROR: "HTTP_ERROR";
+        readonly PERFORMANCE: "PERFORMANCE";
+        readonly SSL_CERTIFICATE: "SSL_CERTIFICATE";
+        readonly MAINTENANCE: "MAINTENANCE";
+        readonly OTHER: "OTHER";
+    }>;
     status: z.ZodEnum<{
         readonly INVESTIGATING: "INVESTIGATING";
         readonly IDENTIFIED: "IDENTIFIED";
@@ -721,6 +931,8 @@ declare const incidentPublicResponseSchema: z.ZodObject<{
         readonly PARTIAL_OUTAGE: "PARTIAL_OUTAGE";
         readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
     }>;
+    isAutoGenerated: z.ZodOptional<z.ZodBoolean>;
+    httpStatus: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     startedAt: z.ZodDate;
     resolvedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     durationMinutes: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
@@ -747,6 +959,15 @@ declare const IncidentSeverity: {
     readonly MAJOR_OUTAGE: "MAJOR_OUTAGE";
 };
 type EnumIncidentSeverity = (typeof IncidentSeverity)[keyof typeof IncidentSeverity];
+declare const IncidentType: {
+    readonly OUTAGE: "OUTAGE";
+    readonly HTTP_ERROR: "HTTP_ERROR";
+    readonly PERFORMANCE: "PERFORMANCE";
+    readonly SSL_CERTIFICATE: "SSL_CERTIFICATE";
+    readonly MAINTENANCE: "MAINTENANCE";
+    readonly OTHER: "OTHER";
+};
+type EnumIncidentType = (typeof IncidentType)[keyof typeof IncidentType];
 
 type CreateIncidentDTO = z.infer<typeof createIncidentSchema>;
 type UpdateIncidentDTO = z.infer<typeof updateIncidentSchema>;
@@ -876,6 +1097,44 @@ type MonitorResultDTO = z.infer<typeof monitorResultSchema>;
 type ProcessResultsDTO = z.infer<typeof processResultsSchema>;
 type MonitorTargetDTO = z.infer<typeof monitorTargetSchema>;
 
+declare const telegramTestSchema: z.ZodObject<{
+    customMessage: z.ZodOptional<z.ZodString>;
+    botToken: z.ZodOptional<z.ZodString>;
+    chatId: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+declare const telegramTestResponseSchema: z.ZodObject<{
+    success: z.ZodBoolean;
+    message: z.ZodString;
+    chatId: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+declare const updateTelegramConfigSchema: z.ZodObject<{
+    botToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    chatId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    enabled: z.ZodDefault<z.ZodBoolean>;
+    alertsOnMachineHighLoad: z.ZodDefault<z.ZodBoolean>;
+    alertsOnServiceDown: z.ZodDefault<z.ZodBoolean>;
+    cpuThreshold: z.ZodDefault<z.ZodNumber>;
+    ramThreshold: z.ZodDefault<z.ZodNumber>;
+    diskThreshold: z.ZodDefault<z.ZodNumber>;
+}, z.core.$strip>;
+declare const telegramConfigResponseSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    botToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    chatId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    enabled: z.ZodBoolean;
+    alertsOnMachineHighLoad: z.ZodBoolean;
+    alertsOnServiceDown: z.ZodBoolean;
+    cpuThreshold: z.ZodNumber;
+    ramThreshold: z.ZodNumber;
+    diskThreshold: z.ZodNumber;
+    updatedAt: z.ZodOptional<z.ZodDate>;
+}, z.core.$strip>;
+
+type TelegramTestDTO = z.infer<typeof telegramTestSchema>;
+type TelegramTestResponseDTO = z.infer<typeof telegramTestResponseSchema>;
+type UpdateTelegramConfigDTO = z.infer<typeof updateTelegramConfigSchema>;
+type TelegramConfigResponseDTO = z.infer<typeof telegramConfigResponseSchema>;
+
 /**
  * Converte string "HH:mm" em minutos totais desde a meia-noite.
  */
@@ -889,4 +1148,4 @@ declare function minutesToDecimalHours(minutes: number): number;
  */
 declare function formatMinutesToReadable(minutes: number): string;
 
-export { AuthEnums, type CreateDailyMetricDTO, type CreateIncidentDTO, type CreateIncidentUpdateDTO, type CreateMachineDTO, type CreateMaintenanceDTO, type CreateProjectDTO, type CreateServiceDTO, type CreateServiceGroupDTO, type CreateServicePortDTO, type CreateTaskDTO, type CreateTimeLogDTO, type CreateUserDTO, type DailyMetricIdDTO, type DailyMetricResponseDTO, type EnumIncidentSeverity, type EnumIncidentStatus, type EnumLoginStatus, type EnumMaintenanceStatus, type EnumProjectPriority, type EnumProjectStatus, type EnumServicePortProtocol, type EnumServiceStatus, type EnumTaskPriority, type EnumTaskStatus, type EnumTimeLogNature, type IncidentIdDTO, type IncidentPublicResponseDTO, type IncidentResponseDTO, IncidentSeverity, IncidentStatus, type IncidentUpdateIdDTO, type IncidentUpdateResponseDTO, type LoginAuthDTO, type MachineIdDTO, type MachineResponseDTO, type MaintenanceIdDTO, type MaintenancePublicResponseDTO, type MaintenanceResponseDTO, MaintenanceStatus, type MonitorResultDTO, type MonitorTargetDTO, type PaginatedDailyMetricsDTO, type PaginatedIncidentUpdatesDTO, type PaginatedIncidentsDTO, type PaginatedMachinesDTO, type PaginatedMaintenancesDTO, type PaginatedProjectsDTO, type PaginatedResultDTO, type PaginatedServiceGroupsDTO, type PaginatedServicePortsDTO, type PaginatedTasksDTO, type PaginatedTimeLogsDTO, type PaginatedUsersDTO, type PaginationMetaDTO, type PaginationQueryDTO, type ProblemDetailsDTO, type ProcessResultsDTO, type ProjectIdDTO, ProjectPriority, type ProjectResponseDTO, ProjectStatus, type ServiceGroupIdDTO, type ServiceGroupResponseDTO, type ServiceIdDTO, type ServicePortIdDTO, ServicePortProtocol, type ServicePortResponseDTO, type ServicePublicResponseDTO, type ServiceResponseDTO, ServiceStatus, type TaskIdDTO, TaskPriority, type TaskResponseDTO, TaskStatus, TimeLogNature, type TimeLogResponseDTO, type TokenPayloadDTO, type UpdateDailyMetricDTO, type UpdateIncidentDTO, type UpdateIncidentUpdateDTO, type UpdateMachineDTO, type UpdateMaintenanceDTO, type UpdateProjectDTO, type UpdateServiceDTO, type UpdateServiceGroupDTO, type UpdateServicePortDTO, type UpdateTaskDTO, type UpdateTimeLogDTO, type UpdateUserDTO, type UserIdDTO, type UserResponseDTO, createDailyMetricSchema, createIncidentSchema, createIncidentUpdateSchema, createMachineSchema, createMaintenanceSchema, createPaginatedResponseSchema, createProjectSchema, createServiceGroupSchema, createServicePortSchema, createServiceSchema, createTaskSchema, createTimeLogSchema, createUserSchema, dailyMetricIdSchema, dailyMetricResponseSchema, formatMinutesToReadable, incidentIdSchema, incidentPublicResponseSchema, incidentResponseSchema, incidentUpdateIdSchema, incidentUpdateResponseSchema, loginSchema, machineIdSchema, machineResponseSchema, maintenanceIdSchema, maintenancePublicResponseSchema, maintenanceResponseSchema, minutesToDecimalHours, monitorResultSchema, monitorTargetSchema, monitorTargetsResponseSchema, paginatedTimeLogsResponseSchema, paginationMetaSchema, paginationSchema, pendingTimeResponseSchema, processResultsSchema, projectIdSchema, projectResponseSchema, refreshTokenSchema, registry, rfc7807ErrorSchema, serviceGroupIdSchema, serviceGroupResponseSchema, serviceIdSchema, servicePortIdSchema, servicePortResponseSchema, servicePublicResponseSchema, serviceResponseSchema, taskIdSchema, taskResponseSchema, timeLogResponseSchema, timeStringToMinutes, toggleTimerResponseSchema, updateDailyMetricSchema, updateIncidentSchema, updateIncidentUpdateSchema, updateMachineSchema, updateMaintenanceSchema, updateProjectSchema, updateServiceGroupSchema, updateServicePortSchema, updateServiceSchema, updateTaskSchema, updateTimeLogSchema, updateUserSchema, userIdSchema, userResponseSchema };
+export { AuthEnums, type CheckPortAvailabilityDTO, type CreateDailyMetricDTO, type CreateIncidentDTO, type CreateIncidentUpdateDTO, type CreateMachineDTO, type CreateMaintenanceDTO, type CreateProjectDTO, type CreateServiceDTO, type CreateServiceGroupDTO, type CreateServicePortDTO, type CreateTaskDTO, type CreateTimeLogDTO, type CreateUserDTO, type DailyMetricIdDTO, type DailyMetricResponseDTO, type EnumIncidentSeverity, type EnumIncidentStatus, type EnumIncidentType, type EnumLoginStatus, type EnumMaintenanceStatus, type EnumPortStatus, type EnumProjectPriority, type EnumProjectStatus, type EnumServicePortProtocol, type EnumServiceStatus, type EnumTaskPriority, type EnumTaskStatus, type EnumTimeLogNature, type IncidentIdDTO, type IncidentPublicResponseDTO, type IncidentResponseDTO, IncidentSeverity, IncidentStatus, IncidentType, type IncidentUpdateIdDTO, type IncidentUpdateResponseDTO, type LoginAuthDTO, type MachineDetailResponseDTO, type MachineHeartbeatDTO, type MachineIdDTO, type MachineResponseDTO, type MaintenanceIdDTO, type MaintenancePublicResponseDTO, type MaintenanceResponseDTO, MaintenanceStatus, type MonitorResultDTO, type MonitorTargetDTO, type PaginatedDailyMetricsDTO, type PaginatedIncidentUpdatesDTO, type PaginatedIncidentsDTO, type PaginatedMachinesDTO, type PaginatedMaintenancesDTO, type PaginatedProjectsDTO, type PaginatedResultDTO, type PaginatedServiceGroupsDTO, type PaginatedServicePortsDTO, type PaginatedTasksDTO, type PaginatedTimeLogsDTO, type PaginatedUsersDTO, type PaginationMetaDTO, type PaginationQueryDTO, PortStatus, type ProblemDetailsDTO, type ProcessResultsDTO, type ProjectIdDTO, ProjectPriority, type ProjectResponseDTO, ProjectStatus, type ServiceGroupIdDTO, type ServiceGroupResponseDTO, type ServiceIdDTO, type ServicePortIdDTO, ServicePortProtocol, type ServicePortResponseDTO, type ServicePublicResponseDTO, type ServiceResponseDTO, ServiceStatus, type SuggestFreePortsDTO, type TaskIdDTO, TaskPriority, type TaskResponseDTO, TaskStatus, type TelegramConfigResponseDTO, type TelegramTestDTO, type TelegramTestResponseDTO, TimeLogNature, type TimeLogResponseDTO, type TokenPayloadDTO, type UpdateDailyMetricDTO, type UpdateIncidentDTO, type UpdateIncidentUpdateDTO, type UpdateMachineDTO, type UpdateMaintenanceDTO, type UpdateProjectDTO, type UpdateServiceDTO, type UpdateServiceGroupDTO, type UpdateServicePortDTO, type UpdateTaskDTO, type UpdateTelegramConfigDTO, type UpdateTimeLogDTO, type UpdateUserDTO, type UserIdDTO, type UserResponseDTO, checkPortAvailabilitySchema, createDailyMetricSchema, createIncidentSchema, createIncidentUpdateSchema, createMachineSchema, createMaintenanceSchema, createPaginatedResponseSchema, createProjectSchema, createServiceGroupSchema, createServicePortSchema, createServiceSchema, createTaskSchema, createTimeLogSchema, createUserSchema, dailyMetricIdSchema, dailyMetricResponseSchema, formatMinutesToReadable, incidentIdSchema, incidentPublicResponseSchema, incidentResponseSchema, incidentUpdateIdSchema, incidentUpdateResponseSchema, loginSchema, machineDetailResponseSchema, machineHeartbeatSchema, machineIdSchema, machineResponseSchema, maintenanceIdSchema, maintenancePublicResponseSchema, maintenanceResponseSchema, minutesToDecimalHours, monitorResultSchema, monitorTargetSchema, monitorTargetsResponseSchema, paginatedTimeLogsResponseSchema, paginationMetaSchema, paginationSchema, pendingTimeResponseSchema, processResultsSchema, projectIdSchema, projectResponseSchema, refreshTokenSchema, registry, rfc7807ErrorSchema, serviceGroupIdSchema, serviceGroupResponseSchema, serviceIdSchema, servicePortIdSchema, servicePortResponseSchema, servicePublicResponseSchema, serviceResponseSchema, suggestFreePortsQuerySchema, taskIdSchema, taskResponseSchema, telegramConfigResponseSchema, telegramTestResponseSchema, telegramTestSchema, timeLogResponseSchema, timeStringToMinutes, toggleTimerResponseSchema, updateDailyMetricSchema, updateIncidentSchema, updateIncidentUpdateSchema, updateMachineSchema, updateMaintenanceSchema, updateProjectSchema, updateServiceGroupSchema, updateServicePortSchema, updateServiceSchema, updateTaskSchema, updateTelegramConfigSchema, updateTimeLogSchema, updateUserSchema, userIdSchema, userResponseSchema };

@@ -64,6 +64,24 @@ export const createMachineSchema = registry.register(
       .optional()
       .openapi({ example: '200.181.10.15' }),
 
+    agentToken: z
+      .string()
+      .trim()
+      .nullable()
+      .optional()
+      .openapi({ example: 'hlth_agt_9b7c2a1e84' }),
+    diskTotal: z
+      .string()
+      .trim()
+      .nullable()
+      .optional()
+      .openapi({ example: '512 GB SSD NVMe' }),
+    ramUsagePercent: z.number().nullable().optional(),
+    cpuUsagePercent: z.number().nullable().optional(),
+    diskUsagePercent: z.number().nullable().optional(),
+    uptimeSeconds: z.number().nullable().optional(),
+    lastHeartbeat: z.coerce.date().nullable().optional(),
+
     description: z
       .string()
       .max(1000, { message: 'Descrição muito longa.' })
@@ -88,6 +106,23 @@ export const updateMachineSchema = registry.register(
   }),
 );
 
+// Schema de Heartbeat do Agente
+export const machineHeartbeatSchema = registry.register(
+  'MachineHeartbeatRequest',
+  z.object({
+    os: z.string().optional(),
+    cpu: z.string().optional(),
+    ramTotal: z.string().optional(),
+    diskTotal: z.string().optional(),
+    ramUsagePercent: z.number().optional(),
+    cpuUsagePercent: z.number().optional(),
+    diskUsagePercent: z.number().optional(),
+    uptimeSeconds: z.number().optional(),
+    localIp: z.string().optional(),
+    publicIp: z.string().optional(),
+  }),
+);
+
 // Schema de Resposta
 export const machineResponseSchema = registry.register(
   'MachineResponse',
@@ -95,15 +130,80 @@ export const machineResponseSchema = registry.register(
     id: z.string().uuid(),
     name: z.string(),
     slug: z.string(),
+    agentToken: z.string().nullable().optional(),
     os: z.string().nullable(),
     cpu: z.string().nullable(),
     ramTotal: z.string().nullable(),
+    diskTotal: z.string().nullable().optional(),
+    ramUsagePercent: z.number().nullable().optional(),
+    cpuUsagePercent: z.number().nullable().optional(),
+    diskUsagePercent: z.number().nullable().optional(),
+    uptimeSeconds: z.number().nullable().optional(),
+    lastHeartbeat: z.date().nullable().optional(),
     localIp: z.string().nullable(),
     publicIp: z.string().nullable(),
     description: z.string().nullable(),
     online: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date(),
+  }),
+);
+
+export const machineDetailResponseSchema = registry.register(
+  'MachineDetailResponse',
+  machineResponseSchema.extend({
+    services: z
+      .array(
+        z.object({
+          id: z.string().uuid(),
+          name: z.string(),
+          slug: z.string(),
+          url: z.string(),
+          status: z.string(),
+          uptime30d: z.number(),
+          avgResponseMs: z.number(),
+          ports: z
+            .array(
+              z.object({
+                id: z.string().uuid(),
+                port: z.number(),
+                protocol: z.string(),
+                description: z.string().nullable().optional(),
+                status: z.string().optional(),
+              }),
+            )
+            .optional(),
+        }),
+      )
+      .optional(),
+    ports: z
+      .array(
+        z.object({
+          id: z.string().uuid(),
+          port: z.number(),
+          protocol: z.string(),
+          label: z.string().nullable().optional(),
+          description: z.string().nullable().optional(),
+          status: z.string(),
+          isPublic: z.boolean(),
+          service: z
+            .object({
+              id: z.string().uuid(),
+              name: z.string(),
+              slug: z.string(),
+            })
+            .nullable()
+            .optional(),
+          project: z
+            .object({
+              id: z.string().uuid(),
+              name: z.string(),
+            })
+            .nullable()
+            .optional(),
+        }),
+      )
+      .optional(),
   }),
 );
 

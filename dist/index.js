@@ -446,11 +446,13 @@ var createServiceSchema = registry.register(
       description: "Identificador \xFAnico amig\xE1vel (URL-safe)",
       example: "api-pagamentos"
     }),
-    machineSlug: z.string({
-      message: "A m\xE1quina (machineSlug) \xE9 obrigat\xF3ria."
-    }).trim().openapi({
+    machineSlug: z.string().trim().nullable().optional().openapi({
       description: "Slug da m\xE1quina onde o servi\xE7o est\xE1 hospedado",
       example: "server-prod-01"
+    }),
+    machineId: z.string().uuid({ message: "O ID da m\xE1quina deve ser um UUID v\xE1lido." }).nullable().optional().openapi({
+      description: "ID da m\xE1quina associada ao servi\xE7o",
+      example: "123e4567-e89b-12d3-a456-426614174000"
     }),
     url: z.string({
       message: "A URL do servi\xE7o \xE9 obrigat\xF3ria."
@@ -475,6 +477,18 @@ var createServiceSchema = registry.register(
     isStandalone: z.boolean().default(false).openapi({
       description: "Indica se o servi\xE7o \xE9 independente (standalone)",
       example: false
+    }),
+    isPrivate: z.boolean().default(false).openapi({
+      description: "Indica se o servi\xE7o \xE9 privado (n\xE3o exibido publicamente no painel)",
+      example: false
+    }),
+    showExternalLink: z.boolean().default(false).openapi({
+      description: "Indica se deve exibir bot\xE3o direto para o servi\xE7o",
+      example: false
+    }),
+    externalUrl: z.string().trim().nullable().optional().openapi({
+      description: "URL de acesso ao servi\xE7o se diferente da URL de ping",
+      example: "https://app.meusistema.com"
     })
   })
 );
@@ -498,8 +512,12 @@ var serviceResponseSchema = registry.register(
     orderIndex: z.number().int(),
     uptime30d: z.number(),
     avgResponseMs: z.number().int(),
-    machineSlug: z.string(),
+    machineId: z.string().uuid().nullable().optional(),
+    machineSlug: z.string().nullable().optional(),
     isMonitored: z.boolean(),
+    isPrivate: z.boolean().default(false),
+    showExternalLink: z.boolean().default(false),
+    externalUrl: z.string().nullable().optional(),
     createdAt: z.date(),
     updatedAt: z.date()
   })
@@ -512,11 +530,14 @@ var servicePublicResponseSchema = registry.register(
     name: z.string(),
     slug: z.string(),
     description: z.string().nullable().optional(),
+    url: z.string().optional(),
     status: z.nativeEnum(ServiceStatus),
     isStandalone: z.boolean(),
     orderIndex: z.number().int(),
     uptime30d: z.number(),
-    avgResponseMs: z.number().int()
+    avgResponseMs: z.number().int(),
+    showExternalLink: z.boolean().default(false),
+    externalUrl: z.string().nullable().optional()
   })
 );
 var serviceIdSchema = z.object({
@@ -598,15 +619,17 @@ var ServicePortProtocol = {
   HTTP: "HTTP",
   HTTPS: "HTTPS"
 };
+var PortStatus = {
+  ACTIVE: "ACTIVE",
+  RESERVED: "RESERVED",
+  INACTIVE: "INACTIVE"
+};
 
 // src/modules/service-port/service-port.schemas.ts
 var createServicePortSchema = registry.register(
   "CreateServicePortRequest",
   z.object({
-    serviceId: z.string({ message: "O ID do servi\xE7o \xE9 obrigat\xF3rio." }).uuid({ message: "O ID do servi\xE7o deve ser um UUID v\xE1lido." }).openapi({
-      description: "UUID do servi\xE7o dono desta porta"
-    }),
-    port: z.number({ message: "O n\xFAmero da porta \xE9 obrigat\xF3rio." }).int().min(1).max(65535).openapi({
+    port: z.number({ message: "O n\xFAmero da porta \xE9 obrigat\xF3rio." }).int("A porta deve ser um n\xFAmero inteiro.").min(1, "A porta m\xEDnima \xE9 1.").max(65535, "A porta m\xE1xima \xE9 65535.").openapi({
       description: "N\xFAmero da porta (1 a 65535)",
       example: 443
     }),
@@ -616,9 +639,30 @@ var createServicePortSchema = registry.register(
       description: "Protocolo de comunica\xE7\xE3o",
       example: "HTTPS"
     }),
+    machineId: z.string().uuid({ message: "O ID da m\xE1quina deve ser um UUID v\xE1lido." }).nullable().optional().openapi({
+      description: "UUID da m\xE1quina/host em que a porta est\xE1 alocada"
+    }),
+    serviceId: z.string().uuid({ message: "O ID do servi\xE7o deve ser um UUID v\xE1lido." }).nullable().optional().openapi({
+      description: "UUID do servi\xE7o associado a esta porta"
+    }),
+    projectId: z.string().uuid({ message: "O ID do projeto deve ser um UUID v\xE1lido." }).nullable().optional().openapi({
+      description: "UUID do projeto associado a esta porta"
+    }),
+    label: z.string().max(100, { message: "R\xF3tulo muito longo." }).trim().nullable().optional().openapi({
+      description: "Identificador ou nome curto da aplica\xE7\xE3o (ex: Backend API)",
+      example: "Backend API"
+    }),
     description: z.string().max(255, { message: "Descri\xE7\xE3o muito longa." }).trim().nullable().optional().openapi({
-      description: "Descri\xE7\xE3o ou uso da porta",
-      example: "Porta principal da API"
+      description: "Descri\xE7\xE3o ou anota\xE7\xF5es sobre a aloca\xE7\xE3o da porta",
+      example: "Porta principal da API em produ\xE7\xE3o"
+    }),
+    status: z.nativeEnum(PortStatus).default(PortStatus.ACTIVE).openapi({
+      description: "Status da aloca\xE7\xE3o da porta",
+      example: PortStatus.ACTIVE
+    }),
+    isPublic: z.boolean().default(false).openapi({
+      description: "Indica se a porta est\xE1 exposta publicamente na internet",
+      example: false
     })
   })
 );
@@ -632,12 +676,47 @@ var servicePortResponseSchema = registry.register(
   "ServicePortResponse",
   z.object({
     id: z.string().uuid(),
-    serviceId: z.string().uuid(),
     port: z.number().int(),
     protocol: z.nativeEnum(ServicePortProtocol),
+    machineId: z.string().uuid().nullable().optional(),
+    serviceId: z.string().uuid().nullable().optional(),
+    projectId: z.string().uuid().nullable().optional(),
+    label: z.string().nullable().optional(),
     description: z.string().nullable().optional(),
+    status: z.nativeEnum(PortStatus),
+    isPublic: z.boolean(),
+    machine: z.object({
+      id: z.string().uuid(),
+      name: z.string(),
+      slug: z.string()
+    }).nullable().optional(),
+    service: z.object({
+      id: z.string().uuid(),
+      name: z.string(),
+      slug: z.string()
+    }).nullable().optional(),
+    project: z.object({
+      id: z.string().uuid(),
+      name: z.string()
+    }).nullable().optional(),
     createdAt: z.date(),
     updatedAt: z.date()
+  })
+);
+var checkPortAvailabilitySchema = registry.register(
+  "CheckPortAvailabilityQuery",
+  z.object({
+    machineId: z.string().uuid({ message: "O ID da m\xE1quina \xE9 obrigat\xF3rio." }),
+    port: z.coerce.number().int().min(1).max(65535),
+    protocol: z.nativeEnum(ServicePortProtocol).optional().default(ServicePortProtocol.TCP)
+  })
+);
+var suggestFreePortsQuerySchema = registry.register(
+  "SuggestFreePortsQuery",
+  z.object({
+    machineId: z.string().uuid().optional(),
+    startPort: z.coerce.number().int().min(1).max(65535).optional().default(3e3),
+    count: z.coerce.number().int().min(1).max(50).optional().default(5)
   })
 );
 var servicePortIdSchema = z.object({
@@ -673,6 +752,13 @@ var createMachineSchema = registry.register(
     ramTotal: z.string().trim().nullable().optional().openapi({ example: "32 GB DDR5" }),
     localIp: z.string().trim().nullable().optional().openapi({ example: "192.168.0.10" }),
     publicIp: z.string().trim().nullable().optional().openapi({ example: "200.181.10.15" }),
+    agentToken: z.string().trim().nullable().optional().openapi({ example: "hlth_agt_9b7c2a1e84" }),
+    diskTotal: z.string().trim().nullable().optional().openapi({ example: "512 GB SSD NVMe" }),
+    ramUsagePercent: z.number().nullable().optional(),
+    cpuUsagePercent: z.number().nullable().optional(),
+    diskUsagePercent: z.number().nullable().optional(),
+    uptimeSeconds: z.number().nullable().optional(),
+    lastHeartbeat: z.coerce.date().nullable().optional(),
     description: z.string().max(1e3, { message: "Descri\xE7\xE3o muito longa." }).trim().nullable().optional().openapi({
       description: "Descri\xE7\xE3o detalhada ou anota\xE7\xF5es sobre a m\xE1quina"
     }),
@@ -688,21 +774,88 @@ var updateMachineSchema = registry.register(
     message: "Pelo menos um campo deve ser fornecido para atualiza\xE7\xE3o."
   })
 );
+var machineHeartbeatSchema = registry.register(
+  "MachineHeartbeatRequest",
+  z.object({
+    os: z.string().optional(),
+    cpu: z.string().optional(),
+    ramTotal: z.string().optional(),
+    diskTotal: z.string().optional(),
+    ramUsagePercent: z.number().optional(),
+    cpuUsagePercent: z.number().optional(),
+    diskUsagePercent: z.number().optional(),
+    uptimeSeconds: z.number().optional(),
+    localIp: z.string().optional(),
+    publicIp: z.string().optional()
+  })
+);
 var machineResponseSchema = registry.register(
   "MachineResponse",
   z.object({
     id: z.string().uuid(),
     name: z.string(),
     slug: z.string(),
+    agentToken: z.string().nullable().optional(),
     os: z.string().nullable(),
     cpu: z.string().nullable(),
     ramTotal: z.string().nullable(),
+    diskTotal: z.string().nullable().optional(),
+    ramUsagePercent: z.number().nullable().optional(),
+    cpuUsagePercent: z.number().nullable().optional(),
+    diskUsagePercent: z.number().nullable().optional(),
+    uptimeSeconds: z.number().nullable().optional(),
+    lastHeartbeat: z.date().nullable().optional(),
     localIp: z.string().nullable(),
     publicIp: z.string().nullable(),
     description: z.string().nullable(),
     online: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date()
+  })
+);
+var machineDetailResponseSchema = registry.register(
+  "MachineDetailResponse",
+  machineResponseSchema.extend({
+    services: z.array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string(),
+        slug: z.string(),
+        url: z.string(),
+        status: z.string(),
+        uptime30d: z.number(),
+        avgResponseMs: z.number(),
+        ports: z.array(
+          z.object({
+            id: z.string().uuid(),
+            port: z.number(),
+            protocol: z.string(),
+            description: z.string().nullable().optional(),
+            status: z.string().optional()
+          })
+        ).optional()
+      })
+    ).optional(),
+    ports: z.array(
+      z.object({
+        id: z.string().uuid(),
+        port: z.number(),
+        protocol: z.string(),
+        label: z.string().nullable().optional(),
+        description: z.string().nullable().optional(),
+        status: z.string(),
+        isPublic: z.boolean(),
+        service: z.object({
+          id: z.string().uuid(),
+          name: z.string(),
+          slug: z.string()
+        }).nullable().optional(),
+        project: z.object({
+          id: z.string().uuid(),
+          name: z.string()
+        }).nullable().optional()
+      })
+    ).optional()
   })
 );
 var machineIdSchema = z.object({
@@ -824,6 +977,14 @@ var IncidentSeverity = {
   PARTIAL_OUTAGE: "PARTIAL_OUTAGE",
   MAJOR_OUTAGE: "MAJOR_OUTAGE"
 };
+var IncidentType = {
+  OUTAGE: "OUTAGE",
+  HTTP_ERROR: "HTTP_ERROR",
+  PERFORMANCE: "PERFORMANCE",
+  SSL_CERTIFICATE: "SSL_CERTIFICATE",
+  MAINTENANCE: "MAINTENANCE",
+  OTHER: "OTHER"
+};
 
 // src/modules/incident/incident.schemas.ts
 var createIncidentSchema = registry.register(
@@ -841,6 +1002,10 @@ var createIncidentSchema = registry.register(
     serviceId: z.string().uuid({ message: "O ID do servi\xE7o deve ser um UUID v\xE1lido." }).nullable().optional().openapi({
       description: "UUID do servi\xE7o afetado. Se nulo, afeta a infraestrutura global."
     }),
+    type: z.nativeEnum(IncidentType).default(IncidentType.OTHER).openapi({
+      description: "Categoria/tipo de incidente",
+      example: IncidentType.OUTAGE
+    }),
     severity: z.nativeEnum(IncidentSeverity).openapi({
       description: "N\xEDvel de impacto do incidente",
       example: IncidentSeverity.MAJOR_OUTAGE
@@ -848,6 +1013,18 @@ var createIncidentSchema = registry.register(
     status: z.nativeEnum(IncidentStatus).default(IncidentStatus.INVESTIGATING).openapi({
       description: "Fase atual de tratamento do incidente",
       example: IncidentStatus.INVESTIGATING
+    }),
+    isAutoGenerated: z.boolean().default(false).openapi({
+      description: "Indica se foi detectado/aberto automaticamente pela telemetria",
+      example: false
+    }),
+    httpStatus: z.number().int().nullable().optional().openapi({
+      description: "C\xF3digo de resposta HTTP quando aplic\xE1vel",
+      example: 502
+    }),
+    errorDetails: z.string().nullable().optional().openapi({
+      description: "Detalhes ou traceback da falha detectada",
+      example: "ECONNREFUSED 192.168.1.50:5001"
     }),
     startedAt: z.coerce.date().optional().openapi({
       description: "Data e hora exata em que o incidente come\xE7ou"
@@ -873,8 +1050,12 @@ var incidentResponseSchema = registry.register(
     title: z.string(),
     incidentRef: z.string().nullable(),
     serviceId: z.string().uuid().nullable(),
+    type: z.nativeEnum(IncidentType),
     severity: z.nativeEnum(IncidentSeverity),
     status: z.nativeEnum(IncidentStatus),
+    isAutoGenerated: z.boolean(),
+    httpStatus: z.number().nullable().optional(),
+    errorDetails: z.string().nullable().optional(),
     startedAt: z.date(),
     resolvedAt: z.date().nullable(),
     durationMinutes: z.number().nullable(),
@@ -888,8 +1069,11 @@ var incidentPublicResponseSchema = registry.register(
     id: z.string().uuid(),
     serviceId: z.string().uuid().nullable().optional(),
     title: z.string(),
+    type: z.nativeEnum(IncidentType),
     status: z.nativeEnum(IncidentStatus),
     severity: z.nativeEnum(IncidentSeverity),
+    isAutoGenerated: z.boolean().optional(),
+    httpStatus: z.number().nullable().optional(),
     startedAt: z.date(),
     resolvedAt: z.date().nullable().optional(),
     durationMinutes: z.number().int().nullable().optional(),
@@ -1059,6 +1243,83 @@ var monitorTargetsResponseSchema = registry.register(
   })
 );
 
+// src/modules/notification/notification.schemas.ts
+var telegramTestSchema = registry.register(
+  "TelegramTestRequest",
+  z.object({
+    customMessage: z.string().max(500, { message: "Mensagem muito longa." }).optional().openapi({
+      description: "Mensagem personalizada opcional para o teste",
+      example: "Mensagem de teste disparada pelo painel administrativo"
+    }),
+    botToken: z.string().trim().optional().openapi({
+      description: "Token opcional do bot para testar antes de salvar"
+    }),
+    chatId: z.string().trim().optional().openapi({
+      description: "Chat ID opcional para testar antes de salvar"
+    })
+  })
+);
+var telegramTestResponseSchema = registry.register(
+  "TelegramTestResponse",
+  z.object({
+    success: z.boolean(),
+    message: z.string(),
+    chatId: z.string().optional()
+  })
+);
+var updateTelegramConfigSchema = registry.register(
+  "UpdateTelegramConfigRequest",
+  z.object({
+    botToken: z.string().trim().nullable().optional().openapi({
+      description: "Token de autentica\xE7\xE3o do Bot do Telegram (obtido no @BotFather)",
+      example: "123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+    }),
+    chatId: z.string().trim().nullable().optional().openapi({
+      description: "ID do Chat, Grupo ou Canal de destino no Telegram",
+      example: "-1001234567890"
+    }),
+    enabled: z.boolean().default(false).openapi({
+      description: "Habilitar ou desabilitar o envio autom\xE1tico de alertas via Telegram",
+      example: true
+    }),
+    alertsOnMachineHighLoad: z.boolean().default(true).openapi({
+      description: "Enviar alerta quando m\xE1quina estiver com alta carga (CPU/RAM/Disco)",
+      example: true
+    }),
+    alertsOnServiceDown: z.boolean().default(true).openapi({
+      description: "Enviar alerta quando um servi\xE7o monitorado cair ou falhar",
+      example: true
+    }),
+    cpuThreshold: z.number().min(10).max(100).default(85).openapi({
+      description: "Limite percentual de CPU para disparo de alerta (10-100%)",
+      example: 85
+    }),
+    ramThreshold: z.number().min(10).max(100).default(85).openapi({
+      description: "Limite percentual de Mem\xF3ria RAM para disparo de alerta (10-100%)",
+      example: 85
+    }),
+    diskThreshold: z.number().min(10).max(100).default(90).openapi({
+      description: "Limite percentual de Disco para disparo de alerta (10-100%)",
+      example: 90
+    })
+  })
+);
+var telegramConfigResponseSchema = registry.register(
+  "TelegramConfigResponse",
+  z.object({
+    id: z.string().uuid().optional(),
+    botToken: z.string().nullable().optional(),
+    chatId: z.string().nullable().optional(),
+    enabled: z.boolean(),
+    alertsOnMachineHighLoad: z.boolean(),
+    alertsOnServiceDown: z.boolean(),
+    cpuThreshold: z.number(),
+    ramThreshold: z.number(),
+    diskThreshold: z.number(),
+    updatedAt: z.date().optional()
+  })
+);
+
 // src/common/common.schemas.ts
 var rfc7807ErrorSchema = registry.register(
   "ProblemDetails",
@@ -1137,8 +1398,10 @@ export {
   AuthEnums,
   IncidentSeverity,
   IncidentStatus,
+  IncidentType,
   MaintenanceStatus,
   OpenApiGeneratorV3,
+  PortStatus,
   ProjectPriority,
   ProjectStatus,
   ServicePortProtocol,
@@ -1146,6 +1409,7 @@ export {
   TaskPriority,
   TaskStatus,
   TimeLogNature,
+  checkPortAvailabilitySchema,
   createDailyMetricSchema,
   createIncidentSchema,
   createIncidentUpdateSchema,
@@ -1168,6 +1432,8 @@ export {
   incidentUpdateIdSchema,
   incidentUpdateResponseSchema,
   loginSchema,
+  machineDetailResponseSchema,
+  machineHeartbeatSchema,
   machineIdSchema,
   machineResponseSchema,
   maintenanceIdSchema,
@@ -1194,8 +1460,12 @@ export {
   servicePortResponseSchema,
   servicePublicResponseSchema,
   serviceResponseSchema,
+  suggestFreePortsQuerySchema,
   taskIdSchema,
   taskResponseSchema,
+  telegramConfigResponseSchema,
+  telegramTestResponseSchema,
+  telegramTestSchema,
   timeLogResponseSchema,
   timeStringToMinutes,
   toggleTimerResponseSchema,
@@ -1209,6 +1479,7 @@ export {
   updateServicePortSchema,
   updateServiceSchema,
   updateTaskSchema,
+  updateTelegramConfigSchema,
   updateTimeLogSchema,
   updateUserSchema,
   userIdSchema,

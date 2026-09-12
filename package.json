@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",
-    "watch": "tsup src/index.ts --format esm --watch",
+    "watch": "tsup src/index.ts --format esm --dts --watch",
     "prepare": "npm run build && husky",
     "test": "vitest run",
     "dev": "tsc --watch",
