@@ -1,119 +1,132 @@
 import { z, registry } from '../../lib/registry';
 
+const baseMachineFields = {
+  name: z
+    .string({
+      error: ({ input }) =>
+        input === undefined
+          ? 'O nome da máquina é obrigatório.'
+          : 'O nome da máquina deve ser um texto.',
+    })
+    .min(2, { message: 'Nome da máquina muito curto.' })
+    .max(100, { message: 'Nome da máquina muito longo.' })
+    .trim()
+    .openapi({
+      description: 'Nome de exibição da máquina',
+      example: 'Server Prod 01',
+    }),
+
+  slug: z
+    .string({
+      error: ({ input }) =>
+        input === undefined
+          ? 'O slug é obrigatório.'
+          : 'O slug deve ser um texto.',
+    })
+    .min(2)
+    .max(100)
+    .trim()
+    .openapi({
+      description: 'Identificador único amigável (URL-safe)',
+      example: 'server-prod-01',
+    }),
+
+  os: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: 'Ubuntu 24.04 LTS' }),
+  cpu: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: 'Intel Core i7-12700H' }),
+  ramTotal: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: '32 GB DDR5' }),
+  localIp: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: '192.168.0.10' }),
+  publicIp: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: '200.181.10.15' }),
+
+  agentToken: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: 'hlth_agt_9b7c2a1e84' }),
+  diskTotal: z
+    .string()
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({ example: '512 GB SSD NVMe' }),
+  ramUsagePercent: z.number().nullable().optional(),
+  cpuUsagePercent: z.number().nullable().optional(),
+  diskUsagePercent: z.number().nullable().optional(),
+  uptimeSeconds: z.number().nullable().optional(),
+  lastHeartbeat: z.coerce.date().nullable().optional(),
+  lastHeartbeatInterval: z.number().int().nullable().optional(),
+
+  description: z
+    .string()
+    .max(1000, { message: 'Descrição muito longa.' })
+    .trim()
+    .nullable()
+    .optional()
+    .openapi({
+      description: 'Descrição detalhada ou anotações sobre a máquina',
+    }),
+
+  heartbeatInterval: z
+    .number()
+    .int()
+    .min(5, { message: 'Intervalo mínimo de 5 segundos.' })
+    .max(3600, { message: 'Intervalo máximo de 3600 segundos (1 hora).' })
+    .optional()
+    .openapi({
+      description: 'Intervalo de coleta de telemetria do agente em segundos',
+      example: 60,
+    }),
+
+  online: z.boolean().optional().openapi({
+    description: 'Status atual da máquina (Online/Offline)',
+    example: true,
+  }),
+};
+
+export const baseMachineSchema = z.object(baseMachineFields);
+
 export const createMachineSchema = registry.register(
   'CreateMachineRequest',
-  z.object({
-    name: z
-      .string({
-        error: ({ input }) =>
-          input === undefined
-            ? 'O nome da máquina é obrigatório.'
-            : 'O nome da máquina deve ser um texto.',
-      })
-      .min(2, { message: 'Nome da máquina muito curto.' })
-      .max(100, { message: 'Nome da máquina muito longo.' })
-      .trim()
-      .openapi({
-        description: 'Nome de exibição da máquina',
-        example: 'Server Prod 01',
-      }),
-
-    slug: z
-      .string({
-        error: ({ input }) =>
-          input === undefined
-            ? 'O slug é obrigatório.'
-            : 'O slug deve ser um texto.',
-      })
-      .min(2)
-      .max(100)
-      .trim()
-      .openapi({
-        description: 'Identificador único amigável (URL-safe)',
-        example: 'server-prod-01',
-      }),
-
-    os: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: 'Ubuntu 24.04 LTS' }),
-    cpu: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: 'Intel Core i7-12700H' }),
-    ramTotal: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: '32 GB DDR5' }),
-    localIp: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: '192.168.0.10' }),
-    publicIp: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: '200.181.10.15' }),
-
-    agentToken: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: 'hlth_agt_9b7c2a1e84' }),
-    diskTotal: z
-      .string()
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({ example: '512 GB SSD NVMe' }),
-    ramUsagePercent: z.number().nullable().optional(),
-    cpuUsagePercent: z.number().nullable().optional(),
-    diskUsagePercent: z.number().nullable().optional(),
-    uptimeSeconds: z.number().nullable().optional(),
-    lastHeartbeat: z.coerce.date().nullable().optional(),
-
-    description: z
-      .string()
-      .max(1000, { message: 'Descrição muito longa.' })
-      .trim()
-      .nullable()
-      .optional()
-      .openapi({
-        description: 'Descrição detalhada ou anotações sobre a máquina',
-      }),
-
+  baseMachineSchema.extend({
     heartbeatInterval: z
       .number()
       .int()
       .min(5, { message: 'Intervalo mínimo de 5 segundos.' })
       .max(3600, { message: 'Intervalo máximo de 3600 segundos (1 hora).' })
       .default(60)
-      .optional()
-      .openapi({
-        description: 'Intervalo de coleta de telemetria do agente em segundos',
-        example: 60,
-      }),
-
-    online: z.boolean().default(false).openapi({
-      description: 'Status atual da máquina (Online/Offline)',
-      example: true,
-    }),
+      .optional(),
+    online: z.boolean().default(false).optional(),
   }),
 );
 
 export const updateMachineSchema = registry.register(
   'UpdateMachineRequest',
-  createMachineSchema.partial().refine((data) => Object.keys(data).length > 0, {
+  baseMachineSchema.partial().refine((data) => Object.keys(data).length > 0, {
     message: 'Pelo menos um campo deve ser fornecido para atualização.',
   }),
 );
@@ -152,6 +165,7 @@ export const machineResponseSchema = registry.register(
     diskUsagePercent: z.number().nullable().optional(),
     uptimeSeconds: z.number().nullable().optional(),
     lastHeartbeat: z.date().nullable().optional(),
+    lastHeartbeatInterval: z.number().int().nullable().optional(),
     localIp: z.string().nullable(),
     publicIp: z.string().nullable(),
     description: z.string().nullable(),

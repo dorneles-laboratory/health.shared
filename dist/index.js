@@ -732,49 +732,55 @@ var servicePortIdSchema = z.object({
 });
 
 // src/modules/machine/machine.schemas.ts
+var baseMachineFields = {
+  name: z.string({
+    error: ({ input }) => input === void 0 ? "O nome da m\xE1quina \xE9 obrigat\xF3rio." : "O nome da m\xE1quina deve ser um texto."
+  }).min(2, { message: "Nome da m\xE1quina muito curto." }).max(100, { message: "Nome da m\xE1quina muito longo." }).trim().openapi({
+    description: "Nome de exibi\xE7\xE3o da m\xE1quina",
+    example: "Server Prod 01"
+  }),
+  slug: z.string({
+    error: ({ input }) => input === void 0 ? "O slug \xE9 obrigat\xF3rio." : "O slug deve ser um texto."
+  }).min(2).max(100).trim().openapi({
+    description: "Identificador \xFAnico amig\xE1vel (URL-safe)",
+    example: "server-prod-01"
+  }),
+  os: z.string().trim().nullable().optional().openapi({ example: "Ubuntu 24.04 LTS" }),
+  cpu: z.string().trim().nullable().optional().openapi({ example: "Intel Core i7-12700H" }),
+  ramTotal: z.string().trim().nullable().optional().openapi({ example: "32 GB DDR5" }),
+  localIp: z.string().trim().nullable().optional().openapi({ example: "192.168.0.10" }),
+  publicIp: z.string().trim().nullable().optional().openapi({ example: "200.181.10.15" }),
+  agentToken: z.string().trim().nullable().optional().openapi({ example: "hlth_agt_9b7c2a1e84" }),
+  diskTotal: z.string().trim().nullable().optional().openapi({ example: "512 GB SSD NVMe" }),
+  ramUsagePercent: z.number().nullable().optional(),
+  cpuUsagePercent: z.number().nullable().optional(),
+  diskUsagePercent: z.number().nullable().optional(),
+  uptimeSeconds: z.number().nullable().optional(),
+  lastHeartbeat: z.coerce.date().nullable().optional(),
+  lastHeartbeatInterval: z.number().int().nullable().optional(),
+  description: z.string().max(1e3, { message: "Descri\xE7\xE3o muito longa." }).trim().nullable().optional().openapi({
+    description: "Descri\xE7\xE3o detalhada ou anota\xE7\xF5es sobre a m\xE1quina"
+  }),
+  heartbeatInterval: z.number().int().min(5, { message: "Intervalo m\xEDnimo de 5 segundos." }).max(3600, { message: "Intervalo m\xE1ximo de 3600 segundos (1 hora)." }).optional().openapi({
+    description: "Intervalo de coleta de telemetria do agente em segundos",
+    example: 60
+  }),
+  online: z.boolean().optional().openapi({
+    description: "Status atual da m\xE1quina (Online/Offline)",
+    example: true
+  })
+};
+var baseMachineSchema = z.object(baseMachineFields);
 var createMachineSchema = registry.register(
   "CreateMachineRequest",
-  z.object({
-    name: z.string({
-      error: ({ input }) => input === void 0 ? "O nome da m\xE1quina \xE9 obrigat\xF3rio." : "O nome da m\xE1quina deve ser um texto."
-    }).min(2, { message: "Nome da m\xE1quina muito curto." }).max(100, { message: "Nome da m\xE1quina muito longo." }).trim().openapi({
-      description: "Nome de exibi\xE7\xE3o da m\xE1quina",
-      example: "Server Prod 01"
-    }),
-    slug: z.string({
-      error: ({ input }) => input === void 0 ? "O slug \xE9 obrigat\xF3rio." : "O slug deve ser um texto."
-    }).min(2).max(100).trim().openapi({
-      description: "Identificador \xFAnico amig\xE1vel (URL-safe)",
-      example: "server-prod-01"
-    }),
-    os: z.string().trim().nullable().optional().openapi({ example: "Ubuntu 24.04 LTS" }),
-    cpu: z.string().trim().nullable().optional().openapi({ example: "Intel Core i7-12700H" }),
-    ramTotal: z.string().trim().nullable().optional().openapi({ example: "32 GB DDR5" }),
-    localIp: z.string().trim().nullable().optional().openapi({ example: "192.168.0.10" }),
-    publicIp: z.string().trim().nullable().optional().openapi({ example: "200.181.10.15" }),
-    agentToken: z.string().trim().nullable().optional().openapi({ example: "hlth_agt_9b7c2a1e84" }),
-    diskTotal: z.string().trim().nullable().optional().openapi({ example: "512 GB SSD NVMe" }),
-    ramUsagePercent: z.number().nullable().optional(),
-    cpuUsagePercent: z.number().nullable().optional(),
-    diskUsagePercent: z.number().nullable().optional(),
-    uptimeSeconds: z.number().nullable().optional(),
-    lastHeartbeat: z.coerce.date().nullable().optional(),
-    description: z.string().max(1e3, { message: "Descri\xE7\xE3o muito longa." }).trim().nullable().optional().openapi({
-      description: "Descri\xE7\xE3o detalhada ou anota\xE7\xF5es sobre a m\xE1quina"
-    }),
-    heartbeatInterval: z.number().int().min(5, { message: "Intervalo m\xEDnimo de 5 segundos." }).max(3600, { message: "Intervalo m\xE1ximo de 3600 segundos (1 hora)." }).default(60).optional().openapi({
-      description: "Intervalo de coleta de telemetria do agente em segundos",
-      example: 60
-    }),
-    online: z.boolean().default(false).openapi({
-      description: "Status atual da m\xE1quina (Online/Offline)",
-      example: true
-    })
+  baseMachineSchema.extend({
+    heartbeatInterval: z.number().int().min(5, { message: "Intervalo m\xEDnimo de 5 segundos." }).max(3600, { message: "Intervalo m\xE1ximo de 3600 segundos (1 hora)." }).default(60).optional(),
+    online: z.boolean().default(false).optional()
   })
 );
 var updateMachineSchema = registry.register(
   "UpdateMachineRequest",
-  createMachineSchema.partial().refine((data) => Object.keys(data).length > 0, {
+  baseMachineSchema.partial().refine((data) => Object.keys(data).length > 0, {
     message: "Pelo menos um campo deve ser fornecido para atualiza\xE7\xE3o."
   })
 );
@@ -809,6 +815,7 @@ var machineResponseSchema = registry.register(
     diskUsagePercent: z.number().nullable().optional(),
     uptimeSeconds: z.number().nullable().optional(),
     lastHeartbeat: z.date().nullable().optional(),
+    lastHeartbeatInterval: z.number().int().nullable().optional(),
     localIp: z.string().nullable(),
     publicIp: z.string().nullable(),
     description: z.string().nullable(),
@@ -1414,6 +1421,7 @@ export {
   TaskPriority,
   TaskStatus,
   TimeLogNature,
+  baseMachineSchema,
   checkPortAvailabilitySchema,
   createDailyMetricSchema,
   createIncidentSchema,

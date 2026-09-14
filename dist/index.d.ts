@@ -597,6 +597,26 @@ declare const PortStatus: {
 };
 type EnumPortStatus = (typeof PortStatus)[keyof typeof PortStatus];
 
+declare const baseMachineSchema: z.ZodObject<{
+    name: z.ZodString;
+    slug: z.ZodString;
+    os: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    cpu: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ramTotal: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    localIp: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    publicIp: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    agentToken: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    diskTotal: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    ramUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    cpuUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+    lastHeartbeatInterval: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    heartbeatInterval: z.ZodOptional<z.ZodNumber>;
+    online: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strip>;
 declare const createMachineSchema: z.ZodObject<{
     name: z.ZodString;
     slug: z.ZodString;
@@ -612,9 +632,10 @@ declare const createMachineSchema: z.ZodObject<{
     diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
+    lastHeartbeatInterval: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     heartbeatInterval: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
-    online: z.ZodDefault<z.ZodBoolean>;
+    online: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
 }, z.core.$strip>;
 declare const updateMachineSchema: z.ZodObject<{
     name: z.ZodOptional<z.ZodString>;
@@ -631,9 +652,10 @@ declare const updateMachineSchema: z.ZodObject<{
     diskUsagePercent: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
     uptimeSeconds: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
     lastHeartbeat: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>>;
+    lastHeartbeatInterval: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
     description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
-    heartbeatInterval: z.ZodOptional<z.ZodOptional<z.ZodDefault<z.ZodNumber>>>;
-    online: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    heartbeatInterval: z.ZodOptional<z.ZodOptional<z.ZodNumber>>;
+    online: z.ZodOptional<z.ZodOptional<z.ZodBoolean>>;
 }, z.core.$strip>;
 declare const machineHeartbeatSchema: z.ZodObject<{
     os: z.ZodOptional<z.ZodString>;
@@ -661,6 +683,7 @@ declare const machineResponseSchema: z.ZodObject<{
     diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    lastHeartbeatInterval: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     localIp: z.ZodNullable<z.ZodString>;
     publicIp: z.ZodNullable<z.ZodString>;
     description: z.ZodNullable<z.ZodString>;
@@ -683,6 +706,7 @@ declare const machineDetailResponseSchema: z.ZodObject<{
     diskUsagePercent: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
+    lastHeartbeatInterval: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     localIp: z.ZodNullable<z.ZodString>;
     publicIp: z.ZodNullable<z.ZodString>;
     description: z.ZodNullable<z.ZodString>;
@@ -1152,4 +1176,4 @@ declare function minutesToDecimalHours(minutes: number): number;
  */
 declare function formatMinutesToReadable(minutes: number): string;
 
-export { AuthEnums, type CheckPortAvailabilityDTO, type CreateDailyMetricDTO, type CreateIncidentDTO, type CreateIncidentUpdateDTO, type CreateMachineDTO, type CreateMaintenanceDTO, type CreateProjectDTO, type CreateServiceDTO, type CreateServiceGroupDTO, type CreateServicePortDTO, type CreateTaskDTO, type CreateTimeLogDTO, type CreateUserDTO, type DailyMetricIdDTO, type DailyMetricResponseDTO, type EnumIncidentSeverity, type EnumIncidentStatus, type EnumIncidentType, type EnumLoginStatus, type EnumMaintenanceStatus, type EnumPortStatus, type EnumProjectPriority, type EnumProjectStatus, type EnumServicePortProtocol, type EnumServiceStatus, type EnumTaskPriority, type EnumTaskStatus, type EnumTimeLogNature, type IncidentIdDTO, type IncidentPublicResponseDTO, type IncidentResponseDTO, IncidentSeverity, IncidentStatus, IncidentType, type IncidentUpdateIdDTO, type IncidentUpdateResponseDTO, type LoginAuthDTO, type MachineDetailResponseDTO, type MachineHeartbeatDTO, type MachineIdDTO, type MachineResponseDTO, type MaintenanceIdDTO, type MaintenancePublicResponseDTO, type MaintenanceResponseDTO, MaintenanceStatus, type MonitorResultDTO, type MonitorTargetDTO, type PaginatedDailyMetricsDTO, type PaginatedIncidentUpdatesDTO, type PaginatedIncidentsDTO, type PaginatedMachinesDTO, type PaginatedMaintenancesDTO, type PaginatedProjectsDTO, type PaginatedResultDTO, type PaginatedServiceGroupsDTO, type PaginatedServicePortsDTO, type PaginatedTasksDTO, type PaginatedTimeLogsDTO, type PaginatedUsersDTO, type PaginationMetaDTO, type PaginationQueryDTO, PortStatus, type ProblemDetailsDTO, type ProcessResultsDTO, type ProjectIdDTO, ProjectPriority, type ProjectResponseDTO, ProjectStatus, type ServiceGroupIdDTO, type ServiceGroupResponseDTO, type ServiceIdDTO, type ServicePortIdDTO, ServicePortProtocol, type ServicePortResponseDTO, type ServicePublicResponseDTO, type ServiceResponseDTO, ServiceStatus, type SuggestFreePortsDTO, type TaskIdDTO, TaskPriority, type TaskResponseDTO, TaskStatus, type TelegramConfigResponseDTO, type TelegramTestDTO, type TelegramTestResponseDTO, TimeLogNature, type TimeLogResponseDTO, type TokenPayloadDTO, type UpdateDailyMetricDTO, type UpdateIncidentDTO, type UpdateIncidentUpdateDTO, type UpdateMachineDTO, type UpdateMaintenanceDTO, type UpdateProjectDTO, type UpdateServiceDTO, type UpdateServiceGroupDTO, type UpdateServicePortDTO, type UpdateTaskDTO, type UpdateTelegramConfigDTO, type UpdateTimeLogDTO, type UpdateUserDTO, type UserIdDTO, type UserResponseDTO, checkPortAvailabilitySchema, createDailyMetricSchema, createIncidentSchema, createIncidentUpdateSchema, createMachineSchema, createMaintenanceSchema, createPaginatedResponseSchema, createProjectSchema, createServiceGroupSchema, createServicePortSchema, createServiceSchema, createTaskSchema, createTimeLogSchema, createUserSchema, dailyMetricIdSchema, dailyMetricResponseSchema, formatMinutesToReadable, incidentIdSchema, incidentPublicResponseSchema, incidentResponseSchema, incidentUpdateIdSchema, incidentUpdateResponseSchema, loginSchema, machineDetailResponseSchema, machineHeartbeatSchema, machineIdSchema, machineResponseSchema, maintenanceIdSchema, maintenancePublicResponseSchema, maintenanceResponseSchema, minutesToDecimalHours, monitorResultSchema, monitorTargetSchema, monitorTargetsResponseSchema, paginatedTimeLogsResponseSchema, paginationMetaSchema, paginationSchema, pendingTimeResponseSchema, processResultsSchema, projectIdSchema, projectResponseSchema, refreshTokenSchema, registry, rfc7807ErrorSchema, serviceGroupIdSchema, serviceGroupResponseSchema, serviceIdSchema, servicePortIdSchema, servicePortResponseSchema, servicePublicResponseSchema, serviceResponseSchema, suggestFreePortsQuerySchema, taskIdSchema, taskResponseSchema, telegramConfigResponseSchema, telegramTestResponseSchema, telegramTestSchema, timeLogResponseSchema, timeStringToMinutes, toggleTimerResponseSchema, updateDailyMetricSchema, updateIncidentSchema, updateIncidentUpdateSchema, updateMachineSchema, updateMaintenanceSchema, updateProjectSchema, updateServiceGroupSchema, updateServicePortSchema, updateServiceSchema, updateTaskSchema, updateTelegramConfigSchema, updateTimeLogSchema, updateUserSchema, userIdSchema, userResponseSchema };
+export { AuthEnums, type CheckPortAvailabilityDTO, type CreateDailyMetricDTO, type CreateIncidentDTO, type CreateIncidentUpdateDTO, type CreateMachineDTO, type CreateMaintenanceDTO, type CreateProjectDTO, type CreateServiceDTO, type CreateServiceGroupDTO, type CreateServicePortDTO, type CreateTaskDTO, type CreateTimeLogDTO, type CreateUserDTO, type DailyMetricIdDTO, type DailyMetricResponseDTO, type EnumIncidentSeverity, type EnumIncidentStatus, type EnumIncidentType, type EnumLoginStatus, type EnumMaintenanceStatus, type EnumPortStatus, type EnumProjectPriority, type EnumProjectStatus, type EnumServicePortProtocol, type EnumServiceStatus, type EnumTaskPriority, type EnumTaskStatus, type EnumTimeLogNature, type IncidentIdDTO, type IncidentPublicResponseDTO, type IncidentResponseDTO, IncidentSeverity, IncidentStatus, IncidentType, type IncidentUpdateIdDTO, type IncidentUpdateResponseDTO, type LoginAuthDTO, type MachineDetailResponseDTO, type MachineHeartbeatDTO, type MachineIdDTO, type MachineResponseDTO, type MaintenanceIdDTO, type MaintenancePublicResponseDTO, type MaintenanceResponseDTO, MaintenanceStatus, type MonitorResultDTO, type MonitorTargetDTO, type PaginatedDailyMetricsDTO, type PaginatedIncidentUpdatesDTO, type PaginatedIncidentsDTO, type PaginatedMachinesDTO, type PaginatedMaintenancesDTO, type PaginatedProjectsDTO, type PaginatedResultDTO, type PaginatedServiceGroupsDTO, type PaginatedServicePortsDTO, type PaginatedTasksDTO, type PaginatedTimeLogsDTO, type PaginatedUsersDTO, type PaginationMetaDTO, type PaginationQueryDTO, PortStatus, type ProblemDetailsDTO, type ProcessResultsDTO, type ProjectIdDTO, ProjectPriority, type ProjectResponseDTO, ProjectStatus, type ServiceGroupIdDTO, type ServiceGroupResponseDTO, type ServiceIdDTO, type ServicePortIdDTO, ServicePortProtocol, type ServicePortResponseDTO, type ServicePublicResponseDTO, type ServiceResponseDTO, ServiceStatus, type SuggestFreePortsDTO, type TaskIdDTO, TaskPriority, type TaskResponseDTO, TaskStatus, type TelegramConfigResponseDTO, type TelegramTestDTO, type TelegramTestResponseDTO, TimeLogNature, type TimeLogResponseDTO, type TokenPayloadDTO, type UpdateDailyMetricDTO, type UpdateIncidentDTO, type UpdateIncidentUpdateDTO, type UpdateMachineDTO, type UpdateMaintenanceDTO, type UpdateProjectDTO, type UpdateServiceDTO, type UpdateServiceGroupDTO, type UpdateServicePortDTO, type UpdateTaskDTO, type UpdateTelegramConfigDTO, type UpdateTimeLogDTO, type UpdateUserDTO, type UserIdDTO, type UserResponseDTO, baseMachineSchema, checkPortAvailabilitySchema, createDailyMetricSchema, createIncidentSchema, createIncidentUpdateSchema, createMachineSchema, createMaintenanceSchema, createPaginatedResponseSchema, createProjectSchema, createServiceGroupSchema, createServicePortSchema, createServiceSchema, createTaskSchema, createTimeLogSchema, createUserSchema, dailyMetricIdSchema, dailyMetricResponseSchema, formatMinutesToReadable, incidentIdSchema, incidentPublicResponseSchema, incidentResponseSchema, incidentUpdateIdSchema, incidentUpdateResponseSchema, loginSchema, machineDetailResponseSchema, machineHeartbeatSchema, machineIdSchema, machineResponseSchema, maintenanceIdSchema, maintenancePublicResponseSchema, maintenanceResponseSchema, minutesToDecimalHours, monitorResultSchema, monitorTargetSchema, monitorTargetsResponseSchema, paginatedTimeLogsResponseSchema, paginationMetaSchema, paginationSchema, pendingTimeResponseSchema, processResultsSchema, projectIdSchema, projectResponseSchema, refreshTokenSchema, registry, rfc7807ErrorSchema, serviceGroupIdSchema, serviceGroupResponseSchema, serviceIdSchema, servicePortIdSchema, servicePortResponseSchema, servicePublicResponseSchema, serviceResponseSchema, suggestFreePortsQuerySchema, taskIdSchema, taskResponseSchema, telegramConfigResponseSchema, telegramTestResponseSchema, telegramTestSchema, timeLogResponseSchema, timeStringToMinutes, toggleTimerResponseSchema, updateDailyMetricSchema, updateIncidentSchema, updateIncidentUpdateSchema, updateMachineSchema, updateMaintenanceSchema, updateProjectSchema, updateServiceGroupSchema, updateServicePortSchema, updateServiceSchema, updateTaskSchema, updateTelegramConfigSchema, updateTimeLogSchema, updateUserSchema, userIdSchema, userResponseSchema };
