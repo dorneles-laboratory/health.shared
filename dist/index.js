@@ -94,6 +94,10 @@ var updateUserSchema = createUserSchema.partial().omit({ password: true }).exten
     description: "Nova senha do usu\xE1rio (opcional, com crit\xE9rios de seguran\xE7a)",
     example: "NovaSenha@123"
   }),
+  imageUrl: z.string().url().optional().openapi({
+    description: "URL da foto de perfil do usu\xE1rio",
+    example: "http://localhost:9000/health-media/avatar.png"
+  }),
   isActive: z.boolean().optional()
 }).refine((data) => Object.keys(data).length > 0, {
   message: "Pelo menos um campo deve ser fornecido para atualiza\xE7\xE3o."
@@ -104,13 +108,10 @@ var userResponseSchema = registry.register(
     id: z.string().uuid(),
     name: z.string(),
     email: z.string().email(),
-    // cellphone: z.string().nullable(),
-    // birthDate: z.coerce.date().nullable(),
-    // address: z.string().nullable(),
+    imageUrl: z.string().nullable().optional(),
     isActive: z.boolean(),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date()
-    // deletedAt: z.coerce.date().nullable(),
   })
 );
 var userIdSchema = z.object({
@@ -1472,6 +1473,20 @@ var telegramBotListResponseSchema = registry.register(
   z.array(telegramBotResponseSchema)
 );
 
+// src/modules/upload/upload.schemas.ts
+var uploadResponseSchema = registry.register(
+  "UploadResponse",
+  z.object({
+    url: z.string().openapi({
+      description: "URL p\xFAblica est\xE1tica do arquivo salvo no servidor ou MinIO",
+      example: "http://localhost:9000/health-media/a1b2c3d4e5f6g7h8.jpg"
+    })
+  })
+);
+
+// src/modules/upload/upload.types.ts
+import "zod";
+
 // src/common/common.schemas.ts
 var rfc7807ErrorSchema = registry.register(
   "ProblemDetails",
@@ -1641,6 +1656,7 @@ export {
   updateTelegramConfigSchema,
   updateTimeLogSchema,
   updateUserSchema,
+  uploadResponseSchema,
   userIdSchema,
   userResponseSchema,
   z

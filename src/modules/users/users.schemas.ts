@@ -90,6 +90,11 @@ export const updateUserSchema = createUserSchema
         example: 'NovaSenha@123',
       }),
 
+    imageUrl: z.string().url().optional().openapi({
+      description: 'URL da foto de perfil do usuário',
+      example: 'http://localhost:9000/health-media/avatar.png',
+    }),
+
     isActive: z.boolean().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
@@ -103,13 +108,10 @@ export const userResponseSchema = registry.register(
     id: z.string().uuid(),
     name: z.string(),
     email: z.string().email(),
-    // cellphone: z.string().nullable(),
-    // birthDate: z.coerce.date().nullable(),
-    // address: z.string().nullable(),
+    imageUrl: z.string().nullable().optional(),
     isActive: z.boolean(),
     createdAt: z.coerce.date(),
     updatedAt: z.coerce.date(),
-    // deletedAt: z.coerce.date().nullable(),
   }),
 );
 
