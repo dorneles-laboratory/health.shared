@@ -613,6 +613,7 @@ declare const createMachineSchema: z.ZodObject<{
     uptimeSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     lastHeartbeat: z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    heartbeatInterval: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
     online: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
 declare const updateMachineSchema: z.ZodObject<{
@@ -631,6 +632,7 @@ declare const updateMachineSchema: z.ZodObject<{
     uptimeSeconds: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodNumber>>>;
     lastHeartbeat: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodCoercedDate<unknown>>>>;
     description: z.ZodOptional<z.ZodOptional<z.ZodNullable<z.ZodString>>>;
+    heartbeatInterval: z.ZodOptional<z.ZodOptional<z.ZodDefault<z.ZodNumber>>>;
     online: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
 }, z.core.$strip>;
 declare const machineHeartbeatSchema: z.ZodObject<{
@@ -663,6 +665,7 @@ declare const machineResponseSchema: z.ZodObject<{
     publicIp: z.ZodNullable<z.ZodString>;
     description: z.ZodNullable<z.ZodString>;
     online: z.ZodBoolean;
+    heartbeatInterval: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
 }, z.core.$strip>;
@@ -684,6 +687,7 @@ declare const machineDetailResponseSchema: z.ZodObject<{
     publicIp: z.ZodNullable<z.ZodString>;
     description: z.ZodNullable<z.ZodString>;
     online: z.ZodBoolean;
+    heartbeatInterval: z.ZodOptional<z.ZodDefault<z.ZodNumber>>;
     createdAt: z.ZodDate;
     updatedAt: z.ZodDate;
     services: z.ZodOptional<z.ZodArray<z.ZodObject<{

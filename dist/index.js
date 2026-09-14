@@ -762,6 +762,10 @@ var createMachineSchema = registry.register(
     description: z.string().max(1e3, { message: "Descri\xE7\xE3o muito longa." }).trim().nullable().optional().openapi({
       description: "Descri\xE7\xE3o detalhada ou anota\xE7\xF5es sobre a m\xE1quina"
     }),
+    heartbeatInterval: z.number().int().min(5, { message: "Intervalo m\xEDnimo de 5 segundos." }).max(3600, { message: "Intervalo m\xE1ximo de 3600 segundos (1 hora)." }).default(60).optional().openapi({
+      description: "Intervalo de coleta de telemetria do agente em segundos",
+      example: 60
+    }),
     online: z.boolean().default(false).openapi({
       description: "Status atual da m\xE1quina (Online/Offline)",
       example: true
@@ -809,6 +813,7 @@ var machineResponseSchema = registry.register(
     publicIp: z.string().nullable(),
     description: z.string().nullable(),
     online: z.boolean(),
+    heartbeatInterval: z.number().int().default(60).optional(),
     createdAt: z.date(),
     updatedAt: z.date()
   })

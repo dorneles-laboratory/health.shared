@@ -92,6 +92,18 @@ export const createMachineSchema = registry.register(
         description: 'Descrição detalhada ou anotações sobre a máquina',
       }),
 
+    heartbeatInterval: z
+      .number()
+      .int()
+      .min(5, { message: 'Intervalo mínimo de 5 segundos.' })
+      .max(3600, { message: 'Intervalo máximo de 3600 segundos (1 hora).' })
+      .default(60)
+      .optional()
+      .openapi({
+        description: 'Intervalo de coleta de telemetria do agente em segundos',
+        example: 60,
+      }),
+
     online: z.boolean().default(false).openapi({
       description: 'Status atual da máquina (Online/Offline)',
       example: true,
@@ -144,6 +156,7 @@ export const machineResponseSchema = registry.register(
     publicIp: z.string().nullable(),
     description: z.string().nullable(),
     online: z.boolean(),
+    heartbeatInterval: z.number().int().default(60).optional(),
     createdAt: z.date(),
     updatedAt: z.date(),
   }),
