@@ -1259,6 +1259,9 @@ var monitorTargetsResponseSchema = registry.register(
 var telegramTestSchema = registry.register(
   "TelegramTestRequest",
   z.object({
+    botId: z.string().uuid().optional().openapi({
+      description: "ID do bot cadastrado para teste (opcional)"
+    }),
     customMessage: z.string().max(500, { message: "Mensagem muito longa." }).optional().openapi({
       description: "Mensagem personalizada opcional para o teste",
       example: "Mensagem de teste disparada pelo painel administrativo"
@@ -1330,6 +1333,143 @@ var telegramConfigResponseSchema = registry.register(
     diskThreshold: z.number(),
     updatedAt: z.date().optional()
   })
+);
+var baseTelegramBotFields = {
+  name: z.string({
+    error: ({ input }) => input === void 0 ? "O nome do bot \xE9 obrigat\xF3rio." : "O nome do bot deve ser um texto."
+  }).min(2, { message: "Nome do bot muito curto (m\xEDnimo 2 caracteres)." }).max(100, { message: "Nome do bot muito longo (m\xE1ximo 100 caracteres)." }).trim().openapi({
+    description: "Nome de identifica\xE7\xE3o do bot ou fun\xE7\xE3o",
+    example: "Bot Alertas DevOps"
+  }),
+  description: z.string().max(1e3, { message: "Descri\xE7\xE3o muito longa." }).trim().nullable().optional().openapi({
+    description: "Finalidade ou anota\xE7\xF5es sobre o bot",
+    example: "Notifica a equipe de infraestrutura sobre quedas e sobrecargas"
+  }),
+  botToken: z.string({
+    error: ({ input }) => input === void 0 ? "O token do bot \xE9 obrigat\xF3rio." : "O token deve ser um texto."
+  }).min(5, { message: "Token do bot inv\xE1lido." }).trim().openapi({
+    description: "Token HTTP da API do Telegram (obtido com @BotFather)",
+    example: "123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
+  }),
+  chatId: z.string({
+    error: ({ input }) => input === void 0 ? "O Chat ID \xE9 obrigat\xF3rio." : "O Chat ID deve ser um texto."
+  }).min(1, { message: "Chat ID inv\xE1lido." }).trim().openapi({
+    description: "ID do Chat, Grupo ou Canal de destino no Telegram",
+    example: "-1001234567890"
+  }),
+  enabled: z.boolean().optional().openapi({
+    description: "Status ativo/inativo do bot",
+    example: true
+  }),
+  alertsOnServiceDown: z.boolean().optional().openapi({
+    description: "Receber alertas de queda e restaura\xE7\xE3o de servi\xE7os",
+    example: true
+  }),
+  alertsOnMachineHighLoad: z.boolean().optional().openapi({
+    description: "Receber alertas de alta carga e perda de sinal de m\xE1quinas",
+    example: true
+  }),
+  alertsOnMaintenance: z.boolean().optional().openapi({
+    description: "Receber alertas de in\xEDcio e conclus\xE3o de manuten\xE7\xF5es",
+    example: true
+  }),
+  cpuThreshold: z.number().min(10).max(100).optional().openapi({
+    description: "Limiar percentual de CPU (10-100%)",
+    example: 85
+  }),
+  ramThreshold: z.number().min(10).max(100).optional().openapi({
+    description: "Limiar percentual de RAM (10-100%)",
+    example: 85
+  }),
+  diskThreshold: z.number().min(10).max(100).optional().openapi({
+    description: "Limiar percentual de Disco (10-100%)",
+    example: 90
+  }),
+  allServices: z.boolean().optional().openapi({
+    description: "Se true, monitora todos os servi\xE7os do sistema",
+    example: true
+  }),
+  serviceIds: z.array(z.string().uuid()).optional().openapi({
+    description: "Lista de IDs de servi\xE7os espec\xEDficos monitorados (quando allServices \xE9 false)"
+  }),
+  allMachines: z.boolean().optional().openapi({
+    description: "Se true, monitora todas as m\xE1quinas do sistema",
+    example: true
+  }),
+  machineIds: z.array(z.string().uuid()).optional().openapi({
+    description: "Lista de IDs de m\xE1quinas espec\xEDficas monitoradas (quando allMachines \xE9 false)"
+  })
+};
+var baseTelegramBotSchema = z.object(baseTelegramBotFields);
+var createTelegramBotSchema = registry.register(
+  "CreateTelegramBotRequest",
+  baseTelegramBotSchema.extend({
+    name: z.string().min(2).max(100).trim().default("Bot do Telegram").optional(),
+    enabled: z.boolean().default(true).optional(),
+    alertsOnServiceDown: z.boolean().default(true).optional(),
+    alertsOnMachineHighLoad: z.boolean().default(true).optional(),
+    alertsOnMaintenance: z.boolean().default(true).optional(),
+    cpuThreshold: z.number().min(10).max(100).default(85).optional(),
+    ramThreshold: z.number().min(10).max(100).default(85).optional(),
+    diskThreshold: z.number().min(10).max(100).default(90).optional(),
+    allServices: z.boolean().default(true).optional(),
+    serviceIds: z.array(z.string().uuid()).default([]).optional(),
+    allMachines: z.boolean().default(true).optional(),
+    machineIds: z.array(z.string().uuid()).default([]).optional()
+  })
+);
+var updateTelegramBotSchema = registry.register(
+  "UpdateTelegramBotRequest",
+  baseTelegramBotSchema.partial().refine((data) => Object.keys(data).length > 0, {
+    message: "Pelo menos um campo deve ser fornecido para atualiza\xE7\xE3o."
+  })
+);
+var telegramBotIdSchema = z.object({
+  id: z.string().uuid({ message: "O ID do bot deve ser um UUID v\xE1lido." }).openapi({
+    param: { name: "id", in: "path" },
+    description: "Identificador \xFAnico do bot do Telegram"
+  })
+});
+var telegramBotResponseSchema = registry.register(
+  "TelegramBotResponse",
+  z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    description: z.string().nullable().optional(),
+    botToken: z.string(),
+    chatId: z.string(),
+    enabled: z.boolean(),
+    alertsOnServiceDown: z.boolean(),
+    alertsOnMachineHighLoad: z.boolean(),
+    alertsOnMaintenance: z.boolean(),
+    cpuThreshold: z.number(),
+    ramThreshold: z.number(),
+    diskThreshold: z.number(),
+    allServices: z.boolean(),
+    serviceIds: z.array(z.string().uuid()),
+    services: z.array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string(),
+        slug: z.string()
+      })
+    ).optional(),
+    allMachines: z.boolean(),
+    machineIds: z.array(z.string().uuid()),
+    machines: z.array(
+      z.object({
+        id: z.string().uuid(),
+        name: z.string(),
+        slug: z.string()
+      })
+    ).optional(),
+    createdAt: z.date(),
+    updatedAt: z.date()
+  })
+);
+var telegramBotListResponseSchema = registry.register(
+  "TelegramBotListResponse",
+  z.array(telegramBotResponseSchema)
 );
 
 // src/common/common.schemas.ts
@@ -1422,6 +1562,7 @@ export {
   TaskStatus,
   TimeLogNature,
   baseMachineSchema,
+  baseTelegramBotSchema,
   checkPortAvailabilitySchema,
   createDailyMetricSchema,
   createIncidentSchema,
@@ -1434,6 +1575,7 @@ export {
   createServicePortSchema,
   createServiceSchema,
   createTaskSchema,
+  createTelegramBotSchema,
   createTimeLogSchema,
   createUserSchema,
   dailyMetricIdSchema,
@@ -1476,6 +1618,9 @@ export {
   suggestFreePortsQuerySchema,
   taskIdSchema,
   taskResponseSchema,
+  telegramBotIdSchema,
+  telegramBotListResponseSchema,
+  telegramBotResponseSchema,
   telegramConfigResponseSchema,
   telegramTestResponseSchema,
   telegramTestSchema,
@@ -1492,6 +1637,7 @@ export {
   updateServicePortSchema,
   updateServiceSchema,
   updateTaskSchema,
+  updateTelegramBotSchema,
   updateTelegramConfigSchema,
   updateTimeLogSchema,
   updateUserSchema,
